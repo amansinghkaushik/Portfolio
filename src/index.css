@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Condenso";
+  src: url("./assets/fonts/Condenso Demo.otf") format("opentype");
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@layer utilities {
+  .font-condenso {
+    font-family: "Condenso", "Arial Narrow", "Helvetica Neue", sans-serif;
+  }
+
+  @keyframes slideInFromButton {
+    from {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slideOutToButton {
+    from {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+  }
+
+  .animate-menu-open {
+    animation: slideInFromButton 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  .animate-menu-close {
+    animation: slideOutToButton 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+}
+
