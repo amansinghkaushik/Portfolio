@@ -1,11 +1,22 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
+import gsap from 'gsap'
 import amanBg from '../assets/AmanBG.png'
+import heroVideo from '../assets/Vdeo.mp4'
 
 function Hero() {
   const sectionRef = useRef(null)
+  const welcomeRef = useRef(null)
+  const basedRef = useRef(null)
+  const paragraphRef = useRef(null)
+  const portfolioWordRefs = useRef([])
+  const videoRef = useRef(null)
+  const targetVideoTimeRef = useRef(0)
+  const smoothedVideoTimeRef = useRef(0)
+  const transitionTextRef = useRef(null)
   const [progress, setProgress] = useState(0)
   const [isReady, setIsReady] = useState(false)
+  const [videoDuration, setVideoDuration] = useState(0)
 
   const getSectionProgress = () => {
     if (!sectionRef.current) return 0
@@ -40,38 +51,217 @@ function Hero() {
     }
   }, [])
 
-  const isImageExpanded = progress >= 0.28
-  const isSocialVisible = progress >= 0.52
-  const isBentoVisible = progress >= 0.76
+  const shapeRiseStart = 0.12
+  const shapeRiseEnd = 0.30
+  const firstSceneFadeStart = 0.01
+  const firstSceneFadeEnd = 0.10
+  const videoStart = 0.20
+  const videoScrubEnd = 0.34
+  const videoHoldEnd = 0.44
+  const textFadeInStart = 0.35
+  const textFadeInEnd = 0.40
+  const textFadeOutStart = 0.52
+  const textFadeOutEnd = 0.56
+  const videoFadeOutStart = 0.56
+  const videoFadeOutEnd = 0.61
+  const socialStart = 0.67
+  const shapeCollapseStart = videoFadeOutEnd
+  const shapeCollapseEnd = socialStart
+  const imageExpandStart = socialStart
+  const bentoStart = 0.71
+
+  const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
+
+  const isImageExpanded = progress >= imageExpandStart
+  const isSocialVisible = progress >= socialStart
+  const isBentoVisible = progress >= bentoStart
+  const bottomBarDismissStart = Math.max(shapeRiseStart, shapeRiseEnd - 0.05)
+  const bottomBarDismissProgress = clamp((progress - bottomBarDismissStart) / 0.008, 0, 1)
+  const bottomBarTranslateY = isImageExpanded ? 100 : bottomBarDismissProgress * 100
+  const bottomBarOpacity = isImageExpanded ? 0 : 1 - bottomBarDismissProgress
+  const textFadeInProgress = clamp((progress - textFadeInStart) / (textFadeInEnd - textFadeInStart), 0, 1)
+  const textFadeOutProgress = clamp((progress - textFadeOutStart) / (textFadeOutEnd - textFadeOutStart), 0, 1)
+  const textOpacity = progress >= textFadeInStart && progress < textFadeOutEnd 
+    ? (progress < textFadeOutStart ? textFadeInProgress : 1 - textFadeOutProgress)
+    : 0
+  const videoFadeOutProgress = clamp((progress - videoFadeOutStart) / (videoFadeOutEnd - videoFadeOutStart), 0, 1)
+  const videoOpacity = progress >= videoStart && progress < videoFadeOutEnd
+    ? (progress < videoFadeOutStart ? 1 : 1 - videoFadeOutProgress)
+    : 0
   const transitionClass = isReady
     ? 'transition-all duration-[1300ms] ease-[cubic-bezier(0.16,1,0.3,1)]'
     : 'transition-none'
+  const portfolioWordGroups = ['PORT', 'FOLIO']
+  const getPortfolioWordProgress = (index) => {
+    // Last-to-first stagger: the right-most segment begins moving first.
+    const orderFromLast = portfolioWordGroups.length - 1 - index
+    const start = 0.01 + orderFromLast * 0.03
+    const end = start + 0.11
+    return clamp((progress - start) / (end - start), 0, 1)
+  }
+  const shapeRiseProgress = clamp(
+    (progress - shapeRiseStart) / (shapeRiseEnd - shapeRiseStart),
+    0,
+    1,
+  )
+  const shapeRiseEased = 1 - Math.pow(1 - shapeRiseProgress, 2)
+  const shapeCollapseProgress = clamp(
+    (progress - shapeCollapseStart) / (shapeCollapseEnd - shapeCollapseStart),
+    0,
+    1,
+  )
+  const shapeCollapseEased = Math.pow(shapeCollapseProgress, 1.4)
+  const shapeCoverProgress = progress < shapeCollapseStart ? shapeRiseEased : 1 - shapeCollapseEased
+  const shapeRadiusPercent = 0.1 + shapeCoverProgress * 160
+  const videoScrubProgress = clamp(
+    (progress - videoStart) / (videoScrubEnd - videoStart),
+    0,
+    1,
+  )
+
+  useEffect(() => {
+    const fadeProgress = clamp(
+      (progress - firstSceneFadeStart) / (firstSceneFadeEnd - firstSceneFadeStart),
+      0,
+      1,
+    )
+
+    if (welcomeRef.current) {
+      gsap.set(welcomeRef.current, {
+        y: -36 * fadeProgress,
+        opacity: 0.8 * (1 - fadeProgress),
+      })
+    }
+
+    if (basedRef.current) {
+      gsap.set(basedRef.current, {
+        y: -28 * fadeProgress,
+        opacity: 0.8 * (1 - fadeProgress),
+      })
+    }
+
+    if (paragraphRef.current) {
+      gsap.set(paragraphRef.current, {
+        y: -22 * fadeProgress,
+        opacity: 0.8 * (1 - fadeProgress),
+      })
+    }
+
+    portfolioWordRefs.current.forEach((element, index) => {
+      if (!element) return
+      const wordProgress = getPortfolioWordProgress(index)
+      gsap.set(element, {
+        y: -220 * wordProgress,
+        opacity: 1 - wordProgress,
+      })
+    })
+
+    if (transitionTextRef.current) {
+      gsap.set(transitionTextRef.current, {
+        opacity: textOpacity,
+      })
+    }
+  }, [progress, textOpacity])
+
+  useEffect(() => {
+    if (!videoDuration) return
+    targetVideoTimeRef.current = videoDuration * videoScrubProgress
+  }, [videoDuration, videoScrubProgress])
+
+  useEffect(() => {
+    if (!videoRef.current || !videoDuration) return
+
+    let rafId = 0
+    const animateScrub = () => {
+      const video = videoRef.current
+      if (!video) return
+
+      const target = targetVideoTimeRef.current
+      smoothedVideoTimeRef.current += (target - smoothedVideoTimeRef.current) * 0.03
+
+      if (Math.abs(video.currentTime - smoothedVideoTimeRef.current) > 0.016) {
+        video.currentTime = smoothedVideoTimeRef.current
+      }
+
+      rafId = window.requestAnimationFrame(animateScrub)
+    }
+
+    rafId = window.requestAnimationFrame(animateScrub)
+
+    return () => {
+      window.cancelAnimationFrame(rafId)
+    }
+  }, [videoDuration])
 
   return (
-    <section ref={sectionRef} className="relative h-[280vh] w-full bg-white">
+    <section
+      ref={sectionRef}
+      className="relative h-[1000vh] w-full"
+      style={{ backgroundColor: '#ffffff' }}
+    >
       <div
         className={`sticky top-[56px] flex h-[calc(100vh-56px)] w-full items-center justify-center ${transitionClass} ${
           isSocialVisible ? 'px-[30px] py-[30px]' : 'px-0 py-0'
         }`}
       >
+        <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
+          <div
+            className="absolute inset-0 bg-black"
+            style={{
+              clipPath: `circle(${shapeRadiusPercent}% at 50% 100%)`,
+              WebkitClipPath: `circle(${shapeRadiusPercent}% at 50% 100%)`,
+            }}
+          />
+        </div>
+
         <div className="pointer-events-none absolute inset-0 z-0 overflow-visible">
-          <div className="absolute left-1/2 top-[40%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-start">
-            <div className="font-condenso select-none w-full">
-              <div className="text-5xl px-2 uppercase tracking-[0.08em] text-[#000000] opacity-80 text-left">
+          <div className="absolute left-1/2 top-[35%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-start">
+            <div className=" absolute -top-8 -left-20 select-none w-full">
+              <div ref={welcomeRef} className="font-gochi-hand text-6xl uppercase tracking-[0.02em] text-[#000000] opacity-80 text-left ">
                 Welcome to my
               </div>
             </div>
-            <div
-              className="font-condenso select-none text-[500px] uppercase tracking-[0.02em] text-transparent opacity-70"
-              style={{ WebkitTextStroke: '1.8px #8f9299', lineHeight: 0.9 }}
+            <motion.div
+              className="font-condenso select-none whitespace-nowrap text-[500px] uppercase tracking-[0.02em] text-transparent opacity-70"
+              style={{
+                WebkitTextStroke: '2px #8f9299',
+                lineHeight: 0.9,
+                paddingTop: '0.01em',
+                WebkitMaskImage:
+                  'linear-gradient(to bottom, #000 18%, rgba(0,0,0,0.18) 62%, rgba(0,0,0,0.03) 84%, transparent 100%)',
+                maskImage:
+                  'linear-gradient(to bottom, #000 18%, rgba(0,0,0,0.18) 62%, rgba(0,0,0,0.03) 84%, transparent 100%)',
+              }}
             >
-              PORTFOLIO
+              {portfolioWordGroups.map((group, index) => (
+                <motion.span
+                  key={group}
+                  ref={(element) => {
+                    portfolioWordRefs.current[index] = element
+                  }}
+                  className="inline-block"
+                >
+                  {group}
+                </motion.span>
+              ))}
+            </motion.div>
+            <div className="text-right flex-col w-full -mt-26 select-none">
+              <div ref={basedRef} className="text-2xl uppercase tracking-[0.06em] absolute -right-20 px-6 font-light text-[#000000] opacity-80 text-right">
+                Based in INDIA
+              </div>
+              <div ref={paragraphRef} className='ml-auto max-w-[500px] tracking-[0.06em] absolute -right-20 leading-6 text-lg px-6 mt-20 font-light text-[#000000] opacity-80 text-right'>
+                <span className="font-semibold">Turn bold ideas into unforgettable visuals.</span>
+                <br />
+                Plan, design, and animate cinematic stories in minutes. Powered by
+                next-gen image and video AI, your creations are ready to launch
+                anywhere, instantly
+              </div>
             </div>
             {/* <div className="font-condenso select-none w-full">
               <div className="text-5xl px-2 uppercase tracking-[0.08em] text-[#000000] opacity-80 text-right">
-                Welcome to my
+              Welcome to my
               </div>
-            </div> */}
+              </div> */}
           </div>
         </div>
         <div className="relative flex h-full w-full max-w-[1280px] flex-col gap-3 lg:flex-row">
@@ -89,15 +279,51 @@ function Hero() {
               isSocialVisible ? 'rounded-xl' : 'rounded-none'
             } ${
               isSocialVisible ? 'mb-3' : 'mb-0'
-            } ${
-              isImageExpanded ? 'scale-100' : 'scale-[0.75]'
             }`}
           >
             <img
               src={amanBg}
               alt="Portrait"
-              className="absolute bottom-0 left-1/2 z-10 h-full w-auto -translate-x-1/2 object-cover"
+              className={`absolute bottom-0 left-1/2 z-20 h-full w-auto -translate-x-1/2 origin-bottom object-cover ${
+                isImageExpanded ? 'scale-[0.92]' : 'scale-[0.75]'
+              }`}
             />
+
+            <div
+              className="pointer-events-none absolute inset-0 z-0 overflow-hidden transition-opacity duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)]"
+              style={{ opacity: videoOpacity }}
+            >
+              <video
+                ref={videoRef}
+                src={heroVideo}
+                muted
+                playsInline
+                preload="auto"
+                onLoadedMetadata={(event) => {
+                  setVideoDuration(event.currentTarget.duration || 0)
+                  smoothedVideoTimeRef.current = 0
+                  targetVideoTimeRef.current = 0
+                }}
+                className="h-screen w-full object-cover"
+              />
+            </div>
+          </div>
+
+          <div
+            ref={transitionTextRef}
+            className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center text-center"
+            style={{ opacity: textOpacity }}
+          >
+            <div className="absolute right-10 top-14 max-w-[360px] text-right text-white">
+              <p className="text-sm uppercase tracking-[0.24em] text-white/70">Now Creating</p>
+              <p className="mt-3 text-lg leading-relaxed text-white/90">
+                Ideas into campaigns, interfaces, and motion stories that feel handcrafted and unforgettable.
+              </p>
+            </div>
+            <div className="absolute bottom-16 left-6 max-w-fit text-left text-white">
+              <h1 className="text-8xl font-semibold tracking-tight sm:text-9xl">Build</h1>
+              <p className="pl-16 text-4xl font-medium italic tracking-wide text-white/95 sm:text-5xl">what you love</p>
+            </div>
           </div>
 
           <motion.div
@@ -198,6 +424,26 @@ function Hero() {
               <p className="text-6xl font-semibold">$24,414</p>
             </div>
           </div>
+          </div>
+        </div>
+
+        <div
+          className="absolute inset-x-0 bottom-0 z-40 w-full bg-black px-[30px] py-[10px] text-white transition-transform duration-300 ease-out"
+          style={{
+            transform: `translateY(${bottomBarTranslateY}%)`,
+            opacity: bottomBarOpacity,
+          }}
+        >
+          <div className="flex items-center justify-between py-[10px]">
+            <p className="text-sm font-semibold uppercase tracking-[0.12em] leading-[0.1] sm:text-base">
+              <span className='font-gochi-hand text-2xl'>ASK</span> <br /> <span className='pl-2 text-lg leading-0.5 tracking-tighter'>CREATIONS</span>
+            </p>
+            <button
+              type="button"
+              className="pointer-events-auto rounded-full bg-white px-10 py-3 text-sm font-semibold text-black transition-colors hover:bg-zinc-200 sm:px-10"
+            >
+              Get in Touch
+            </button>
           </div>
         </div>
       </div>
