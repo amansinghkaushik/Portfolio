@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import MenuButton from './MenuButton'
 import TextCycler from './TextCycler'
+import { Link } from 'react-router-dom'
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
@@ -33,7 +34,8 @@ function Navbar() {
     <nav className="fixed top-0 left-0 right-0 border-b border-black/10 bg-black px-[30px] z-60">
       {/* Inner NavBar */}
       <div className="flex items-center justify-between py-[10px] text-white">
-        {/* Element 1 - DateTimeDisplay */}
+
+        {/* DateTimeDisplay */}
         <div className="flex-1 font-inter text-sm font-medium text-white">
           {dateTime}
         </div>
@@ -51,6 +53,13 @@ function Navbar() {
             }`}
             style={{ display: isOpen ? 'flex' : 'none' }}
           >
+            <Link
+              to="/"
+              className="text-sm font-medium hover:opacity-70 transition-opacity duration-300"
+              onClick={() => setIsOpen(false)}
+            >
+              Home
+            </Link>
             <a
               href="#works"
               className="text-sm font-medium hover:opacity-70 transition-opacity duration-300"
@@ -63,12 +72,13 @@ function Navbar() {
             >
               About
             </a>
-            <a
-              href="#contact"
+            <Link
+              to="/contact"
               className="text-sm font-medium hover:opacity-70 transition-opacity duration-300"
+              onClick={() => setIsOpen(false)}
             >
               Contact
-            </a>
+            </Link>
           </div>
           <div className="transition-all duration-400 ease-in-out">
             <MenuButton

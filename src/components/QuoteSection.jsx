@@ -61,7 +61,7 @@ function QuoteSection() {
       <div className="max-w-5xl px-8">
         <p
           ref={textRef}
-          className="text-center text-4xl font-semibold lg:text-6xl leading-relaxed tracking-tight text-[#0d0d0d]"
+          className="text-center font-semibold text-6xl leading-relaxed tracking-tighter text-[#0d0d0d]"
         >
           "Design is not just what it looks like. Design is how it works."
         </p>

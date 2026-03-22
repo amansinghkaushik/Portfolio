@@ -425,7 +425,7 @@ function Hero() {
             className={isSocialVisible ? 'overflow-hidden' : 'pointer-events-none overflow-hidden'}
           >
           <div className="flex items-center justify-center rounded-xl bg-[#d8d3e9] px-6 py-7 text-[#43396d]">
-            <p className="text-xl font-semibold tracking-wide">Aman Singh Kaushik</p>
+            <p className="text-3xl font-light font-serif italic tracking-wide">Aman Singh Kaushik</p>
           </div>
           </motion.div>
         </div>
@@ -440,7 +440,7 @@ function Hero() {
           <div className="relative overflow-hidden rounded-xl bg-[#ece868] p-6 text-[#101010] lg:row-span-2">
             <div className="max-w-[240px]">
               <p className="text-2xl font-semibold leading-[1.02] tracking-[-0.025em]">
-                Got an idea? Don't let it rest.
+                Got an <span className='italic font-serif font-medium'>idea </span>? Don't let it rest.
               </p>
               <p className="mt-1.5 text-lg font-regular leading-[1.02] tracking-[-0.025em]">
                 Let's start working on it.
@@ -449,7 +449,7 @@ function Hero() {
 
             <button
               type="button"
-              className="mt-4 ml-auto flex w-fit items-center gap-2 border border-black/40 bg-[#efedb7] px-2.5 py-2.5 text-sm font-medium text-black/70"
+              className="mt-4 ml-auto flex w-fit items-center rounded-lg gap-1 border border-black/40 bg-[#efedb7] px-2 py-2 text-xs font-medium text-black/70"
             >
               <svg
                 className="h-4 w-4"
@@ -475,7 +475,7 @@ function Hero() {
           </div>
 
           <div className="relative overflow-hidden flex gap-10 items-center rounded-xl bg-[#eaf2ff] p-7 text-[#12305f] lg:col-span-2 lg:row-span-2">
-            <p className="max-w-[67%] text-left font-semibold text-2xl tracking-wider leading-6 text-[#143467]">
+            <p className="max-w-[67%] text-left font-medium text-2xl tracking-wider leading-6 text-[#143467]">
               As an engineering student and digital designer, I specialize in crafting meaningful
               UI/UX experiences, visual identities, and logo systems.
             </p>
@@ -501,8 +501,8 @@ function Hero() {
               </motion.div>
             </div>
 
-            <div className="flex flex-1 items-center justify-center overflow-hidden rounded-xl bg-[#7cc4ff] px-4">
-              <div className="flex w-full items-center justify-center gap-4">
+            <div className="flex flex-1 items-center justify-center overflow-hidden rounded-xl bg-[#7cc4ff] px-2">
+              <div className="flex w-full items-center justify-center">
                 {communityIcons.map((icon) => (
                   <div key={icon.alt} className="grid h-14 w-14 place-items-center">
                     <img src={icon.src} alt={icon.alt} className="h-10 w-10 rounded-2xl object-contain" />
@@ -535,7 +535,7 @@ function Hero() {
 
           <div className="relative flex h-full flex-col justify-between overflow-hidden rounded-xl bg-[#eaf2ff] p-4 text-[#12305f] lg:col-start-3 lg:row-span-4 lg:row-start-3">
             <div className="flex items-center justify-between px-4 py-3">
-              <p className="mt-1 text-3xl font-semibold leading-tight text-[#143467]">What <br/> I Offer</p>
+              <p className="mt-1 text-3xl font-light leading-tight tracking-wider font-serif italic text-[#143467]">What <br/> I Offer</p>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="58"
@@ -609,7 +609,7 @@ function Hero() {
             </p>
             <button
               type="button"
-              className="pointer-events-auto rounded-full bg-white px-10 py-3 text-sm font-semibold text-black transition-colors hover:bg-zinc-200 sm:px-10"
+              className="pointer-events-auto bg-white px-10 py-3 text-sm font-semibold text-black transition-colors hover:bg-zinc-200 sm:px-10"
             >
               Get in Touch
             </button>

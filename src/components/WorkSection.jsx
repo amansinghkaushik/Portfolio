@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import taglineMockup from '../assets/taginmockup.png'
+import sundarban from '../assets/sundarban.png'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -53,9 +54,8 @@ function WorkSection() {
       image: taglineMockup,
     },
     {
-      title: 'Visual Experiments',
-      image:
-        'https://images.unsplash.com/photo-1557672172-298e090bd0f1?auto=format&fit=crop&w=900&q=80',
+      title: 'Sundarban',
+      image: sundarban,
     },
     {
       title: 'Product Storytelling',
@@ -72,8 +72,8 @@ function WorkSection() {
   return (
     <section ref={sectionRef} id="work-section" className="relative z-0 ds-section bg-[#ececec]">
       <div className="ds-container">
-        <div className="work-animate-head mb-8 flex items-center justify-between">
-          <h2 className="ds-heading-lg lowercase">work.</h2>
+        <div className="work-animate-head mb-16 flex items-center justify-between">
+          <h2 className="text-8xl tracking-[0.01em] font-bold lowercase">work.</h2>
           <button type="button" className="ds-button-ghost">Show More</button>
         </div>
 

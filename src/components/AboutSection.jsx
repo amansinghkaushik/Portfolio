@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import me from '../assets/me.jpeg'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -65,21 +66,20 @@ function AboutSection() {
   return (
     <section ref={sectionRef} className="ds-section bg-[#ececec] pt-8">
       <div className="ds-container">
-        <div className="about-animate-head mb-8 flex items-center justify-between">
-          <p className="ds-heading-lg lowercase">about.</p>
-          <button type="button" className="ds-button-ghost">Show More</button>
+        <div className="about-animate-head mb-16 flex items-center justify-between">
+          <p className="text-8xl font-bold tracking-[0.01em] lowercase">about.</p>
         </div>
 
-        <p className="about-animate-lead mb-12 max-w-5xl text-[clamp(2rem,4vw,3.4rem)] font-semibold leading-[1.12] tracking-[-0.02em] text-[#141414]">
+        <p className="about-animate-lead mb-12 max-w-2xl text-2xl font-semibold leading-[1.12] tracking-[-0.02em] text-[#141414]">
           I'm an engineering student building at the intersection of UI/UX, web development,
           branding, illustration, and logo design.
         </p>
 
-        <div className="grid items-center gap-10 lg:grid-cols-[1.25fr_1fr]">
+        <div className="flex items-center gap-20 ">
           <img
-            src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=1200&q=80"
+            src={me}
             alt="Creative professional"
-            className="about-animate-block h-[320px] w-full object-cover"
+            className="about-animate-block h-[600px] w-[600px] object-cover"
           />
           <div className="about-animate-block space-y-4">
             <p className="ds-eyebrow">Hybrid Artist + Designer</p>
