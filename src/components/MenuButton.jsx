@@ -1,7 +1,7 @@
 function MenuButton({ variant = 'closed', onClick }) {
   const isOpen = variant === 'open'
   const squareBase =
-    'h-[5px] w-[5px] origin-center bg-[#0d0d0d] transition-all duration-[400ms] ease-in-out'
+    'h-[5px] w-[5px] origin-center bg-[#ffffff] transition-all duration-[400ms] ease-in-out'
 
   return (
     <button

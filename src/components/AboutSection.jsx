@@ -1,32 +1,97 @@
+import { useEffect, useRef } from 'react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
+gsap.registerPlugin(ScrollTrigger)
+
 function AboutSection() {
+  const sectionRef = useRef(null)
+
+  useEffect(() => {
+    if (!sectionRef.current) return
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        '.about-animate-head',
+        { y: 24, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.75,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: 'top 82%',
+          },
+        },
+      )
+
+      gsap.fromTo(
+        '.about-animate-lead',
+        { y: 28, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          delay: 0.08,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: 'top 78%',
+          },
+        },
+      )
+
+      gsap.fromTo(
+        '.about-animate-block',
+        { y: 42, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.9,
+          stagger: 0.14,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: 'top 70%',
+          },
+        },
+      )
+    }, sectionRef)
+
+    return () => ctx.revert()
+  }, [])
+
   return (
-    <section className="bg-[#ececec] px-6 pb-20 pt-16 sm:px-10 lg:px-14">
-      <div className="mx-auto max-w-7xl">
-        <div className="mb-8 flex items-center justify-between">
-          <p className="text-5xl font-semibold lowercase tracking-tight text-[#1f1f1f]">about.</p>
-          <button
-            type="button"
-            className="rounded-sm bg-[#e1e1e1] px-5 py-2.5 text-sm font-medium text-[#1d1d1d] transition-colors hover:bg-[#d8d8d8]"
-          >
-            Show More
-          </button>
+    <section ref={sectionRef} className="ds-section bg-[#ececec] pt-8">
+      <div className="ds-container">
+        <div className="about-animate-head mb-8 flex items-center justify-between">
+          <p className="ds-heading-lg lowercase">about.</p>
+          <button type="button" className="ds-button-ghost">Show More</button>
         </div>
 
-        <p className="mb-12 max-w-4xl text-4xl font-semibold leading-tight tracking-tight text-[#141414]">
-          I collaborate with businesses of all sizes worldwide, using the latest technologies. My
-          designs have also earned multiple awards.
+        <p className="about-animate-lead mb-12 max-w-5xl text-[clamp(2rem,4vw,3.4rem)] font-semibold leading-[1.12] tracking-[-0.02em] text-[#141414]">
+          I'm an engineering student building at the intersection of UI/UX, web development,
+          branding, illustration, and logo design.
         </p>
 
-        <div className="grid items-center gap-10 lg:grid-cols-[1.3fr_1fr]">
+        <div className="grid items-center gap-10 lg:grid-cols-[1.25fr_1fr]">
           <img
             src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=1200&q=80"
             alt="Creative professional"
-            className="h-[320px] w-full object-cover"
+            className="about-animate-block h-[320px] w-full object-cover"
           />
-          <p className="max-w-sm text-lg font-medium leading-relaxed text-[#222222]">
-            I'm dedicated to crafting beautiful and highly functional designs that seamlessly align
-            with my clients' unique needs and long-term goals.
-          </p>
+          <div className="about-animate-block space-y-4">
+            <p className="ds-eyebrow">Hybrid Artist + Designer</p>
+            <p className="ds-body max-w-md">
+              I started with traditional sketching, anatomy studies, and character design, then
+              evolved into digital product design, interaction systems, and brand storytelling.
+            </p>
+            <p className="ds-body max-w-md">
+              My focus is creating experiences that feel expressive like art and functional like
+              engineering.
+            </p>
+          </div>
         </div>
       </div>
     </section>

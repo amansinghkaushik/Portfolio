@@ -10,10 +10,35 @@
   font-display: swap;
 }
 
+:root {
+  --bg-page: #ececec;
+  --bg-surface: #f7f8fa;
+  --text-primary: #131722;
+  --text-secondary: #4a5568;
+
+  --blue-50: #eff6ff;
+  --blue-100: #dbeafe;
+  --blue-200: #bfdbfe;
+  --blue-300: #93c5fd;
+  --blue-400: #60a5fa;
+  --blue-500: #3b82f6;
+  --blue-600: #2563eb;
+  --blue-700: #1d4ed8;
+  --blue-800: #1e40af;
+  --blue-900: #1e3a8a;
+
+  --space-section-y: 5rem;
+  --space-section-x: clamp(1.5rem, 3vw, 3.5rem);
+}
+
 @layer base {
   html,
   body {
     font-family: "Inter", sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--text-primary);
+    background: var(--bg-page);
   }
 
   button,
@@ -25,6 +50,60 @@
 }
 
 @layer utilities {
+  .ds-section {
+    padding-left: var(--space-section-x);
+    padding-right: var(--space-section-x);
+    padding-top: var(--space-section-y);
+    padding-bottom: var(--space-section-y);
+  }
+
+  .ds-container {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 84rem;
+  }
+
+  .ds-eyebrow {
+    font-size: 0.875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+
+  .ds-heading-xl {
+    font-size: clamp(2.5rem, 4.8vw, 4rem);
+    line-height: 1.04;
+    letter-spacing: -0.03em;
+    font-weight: 600;
+  }
+
+  .ds-heading-lg {
+    font-size: clamp(1.75rem, 3.2vw, 2.75rem);
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    font-weight: 600;
+  }
+
+  .ds-body {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+  }
+
+  .ds-button-ghost {
+    border-radius: 0.25rem;
+    background: #e1e1e1;
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #1d1d1d;
+    transition: background-color 180ms ease;
+  }
+
+  .ds-button-ghost:hover {
+    background: #d8d8d8;
+  }
+
   .font-condenso {
     font-family: "Condenso", "Arial Narrow", "Helvetica Neue", sans-serif;
   }

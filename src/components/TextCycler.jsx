@@ -47,7 +47,7 @@ function TextCycler() {
   const lines = texts[index].split('\n')
 
   return (
-    <div className="font-inter text-[#000000] overflow-hidden">
+    <div className="font-inter text-[#ffffff] overflow-hidden">
       <AnimatePresence mode="wait">
         <motion.div
           key={`text_${index}`}

@@ -30,11 +30,11 @@ function Navbar() {
   }, [])
 
   return (
-    <nav className="fixed top-0 left-0 right-0 border-b border-black/10 bg-white px-[30px] z-50">
+    <nav className="fixed top-0 left-0 right-0 border-b border-black/10 bg-black px-[30px] z-60">
       {/* Inner NavBar */}
-      <div className="flex items-center justify-between py-[10px]">
+      <div className="flex items-center justify-between py-[10px] text-white">
         {/* Element 1 - DateTimeDisplay */}
-        <div className="flex-1 font-inter text-sm font-medium text-[#000000]">
+        <div className="flex-1 font-inter text-sm font-medium text-white">
           {dateTime}
         </div>
 
