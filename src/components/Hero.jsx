@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
+import { Link } from 'react-router-dom'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import astrick from '../assets/astrikshape.png'
@@ -306,13 +307,13 @@ function Hero() {
 
         <div className="pointer-events-none absolute inset-0 z-0 overflow-visible">
           <div className="absolute left-1/2 top-[45%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-start">
-            <div className=" absolute -top-8 -left-20 select-none w-full">
+            <div className=" absolute -top-8  select-none w-full">
               <div ref={welcomeRef} className="font-gochi-hand text-6xl uppercase tracking-[0.02em] text-[#1d4ed8] opacity-80 text-left ">
                 Welcome to my
               </div>
             </div>
             <motion.div
-              className="font-condenso select-none whitespace-nowrap text-[500px] uppercase tracking-[0.02em] text-transparent opacity-70"
+              className="font-condenso select-none whitespace-nowrap text-[550px] uppercase tracking-[0.02em] text-transparent opacity-70"
               style={{
                 WebkitTextStroke: '3.5px #23242a', // darker outline
                 lineHeight: 0.9,
@@ -390,7 +391,7 @@ function Hero() {
           </div>
 
           {/* Testimonial/info block below meta grid */}
-          <div className="absolute bottom-56 left-36 z-30 flex items-center gap-3">
+          <div className="absolute bottom-56 left-48 z-30 flex items-center gap-3">
             {/* Avatars */}
             <div className="flex -space-x-3">
               <img src="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=facearea&w=128&q=80" alt="Client 1" className="h-10 w-10 rounded-full border-2 border-white object-cover shadow-md bg-gray-200 z-20" />
@@ -399,7 +400,7 @@ function Hero() {
             </div>
             {/* Text */}
             <div className="ml-2 text-xs max-w-48 font-normal text-[#444]">
-              Trusted by over <span className="font-bold text-black">1200+ happy clients</span> <span className="font-normal">across residential and commercial projects.</span>
+              Trusted by over <span className="font-bold text-black">many happy clients</span> <span className="font-normal">across residential and commercial projects.</span>
             </div>
           </div>
         </div>
@@ -418,7 +419,7 @@ function Hero() {
               <img
                 src={amanBg}
                 alt="Portrait"
-                className={`absolute bottom-0 left-1/2 z-20 h-full w-auto -translate-x-1/2 origin-bottom object-cover ${isImageExpanded ? 'scale-[0.92]' : 'scale-[0.75]'
+                className={`pointer-events-none absolute bottom-0 left-1/2 z-20 h-full w-auto -translate-x-1/2 origin-bottom object-cover ${isImageExpanded ? 'scale-[0.92]' : 'scale-[0.75]'
                   }`}
               />
 
@@ -506,8 +507,8 @@ function Hero() {
                 </p>
               </div>
 
-              <button
-                type="button"
+              <Link
+                to="/contact"
                 className="mt-4 ml-auto flex w-fit items-center rounded-lg gap-1 border border-black/40 bg-[#efedb7] px-2 py-2 text-xs font-medium text-black/70"
               >
                 <svg
@@ -523,8 +524,8 @@ function Hero() {
                   <rect x="9" y="9" width="11" height="11" rx="2" />
                   <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
                 </svg>
-                Copy email
-              </button>
+                Get in Touch
+              </Link>
 
               <img
                 src={arrowIcon}
@@ -682,12 +683,12 @@ function Hero() {
             </div>
 
             <div className="w-1/3 flex justify-end">
-              <button
-                type="button"
+              <Link
+                to="/contact"
                 className="pointer-events-auto bg-white px-8 py-2.5 sm:px-10 sm:py-3 text-sm font-semibold text-black transition-colors hover:bg-zinc-200"
               >
                 Get in Touch
-              </button>
+              </Link>
             </div>
           </div>
         </div>

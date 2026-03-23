@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
 import MenuButton from './MenuButton'
 import TextCycler from './TextCycler'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [dateTime, setDateTime] = useState('')
+  const location = useLocation()
+  const isContactPage = location.pathname === '/contact'
 
   useEffect(() => {
     const updateDateTime = () => {
@@ -52,9 +54,18 @@ function Navbar() {
       {/* Inner NavBar */}
       <div className="flex items-center justify-between py-[10px] text-white">
 
-        {/* DateTimeDisplay */}
-        <div className="flex-1 font-inter text-sm font-medium text-white">
-          {dateTime}
+        {/* DateTimeDisplay or Back Button */}
+        <div className="flex-1 font-inter text-sm font-medium text-white flex items-center">
+          {isContactPage ? (
+            <Link to="/" className="flex items-center gap-2 hover:text-white/70 transition-colors">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Back to Home
+            </Link>
+          ) : (
+            dateTime
+          )}
         </div>
 
         {/* Element 2 - TextCycler */}
@@ -71,13 +82,6 @@ function Navbar() {
             style={{ display: isOpen ? 'flex' : 'none' }}
           >
             <a
-              href="/#hero"
-              className="font-clash-grotesk text-sm font-medium hover:opacity-70 transition-opacity duration-300"
-              onClick={(e) => handleNavClick(e, 'hero')}
-            >
-              Home
-            </a>
-            <a
               href="/#work"
               className="font-clash-grotesk text-sm font-medium hover:opacity-70 transition-opacity duration-300"
               onClick={(e) => handleNavClick(e, 'work')}
@@ -91,13 +95,13 @@ function Navbar() {
             >
               About
             </a>
-            <a
-              href="/#contact"
+            <Link
+              to="/contact"
               className="font-clash-grotesk text-sm font-medium hover:opacity-70 transition-opacity duration-300"
-              onClick={(e) => handleNavClick(e, 'contact')}
+              onClick={() => setIsOpen(false)}
             >
               Contact
-            </a>
+            </Link>
           </div>
           <div className="transition-all duration-400 ease-in-out">
             <MenuButton
