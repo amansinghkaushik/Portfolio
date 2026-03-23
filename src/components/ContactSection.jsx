@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function ContactSection() {
   return (
-    <section className="ds-section bg-[#ececec] py-20">
+    <section id="contact" className="ds-section bg-[#ececec] py-20">
       <div className="ds-container flex flex-col md:flex-row gap-12 items-start justify-between">
         {/* Left: Info */}
         <div className="flex-1 max-w-xl">

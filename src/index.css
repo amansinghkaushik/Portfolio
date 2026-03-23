@@ -1,5 +1,5 @@
-@import url("https://fonts.googleapis.com/css2?family=Gochi+Hand&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap");
+@import url("https://api.fontshare.com/v2/css?f[]=clash-display@200,300,400,500,600,700&f[]=clash-grotesk@200,300,400,500,600,700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Inter:wght@100..900&display=swap");
 @import "tailwindcss";
 
 @font-face {
@@ -27,18 +27,24 @@
   --blue-800: #1e40af;
   --blue-900: #1e3a8a;
 
-  --space-section-y: 5rem;
-  --space-section-x: clamp(1.5rem, 3vw, 3.5rem);
+  /* Spacing: Using multiples of 4 (4px, 8, 12, 16, 24, 32, 48, 64, 96, 128) */
+  --space-section-y: clamp(5rem, 10vw, 8rem);  /* 80px to 128px */
+  --space-section-x: clamp(2rem, 5vw, 4rem);   /* 32px to 64px */
 }
 
 @layer base {
   html,
   body {
-    font-family: "Inter", sans-serif;
+    font-family: "Clash Grotesk", "Inter", sans-serif;
     font-size: 16px;
     line-height: 1.5;
     color: var(--text-primary);
     background: var(--bg-page);
+    scroll-behavior: smooth;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Clash Display", "Inter", sans-serif;
   }
 
   button,
@@ -64,24 +70,60 @@
   }
 
   .ds-eyebrow {
+    font-family: "Clash Grotesk", sans-serif;
     font-size: 0.875rem;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--text-secondary);
+    font-weight: 600;
+  }
+
+  /* Golden Ratio (1.618) Typography Scale based on 16px base */
+  .ds-heading-hero {
+    font-family: "Clash Display", sans-serif;
+    font-size: clamp(4.25rem, 8vw, 11.125rem); /* ~68px to ~178px */
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    font-weight: 500;
   }
 
   .ds-heading-xl {
-    font-size: clamp(2.5rem, 4.8vw, 4rem);
-    line-height: 1.04;
+    font-family: "Clash Display", sans-serif;
+    font-size: clamp(3rem, 6vw, 6.875rem); /* ~48px to ~110px */
+    line-height: 1.0;
     letter-spacing: -0.03em;
-    font-weight: 600;
+    font-weight: 500;
   }
 
   .ds-heading-lg {
-    font-size: clamp(1.75rem, 3.2vw, 2.75rem);
-    line-height: 1.12;
+    font-family: "Clash Display", sans-serif;
+    font-size: clamp(2rem, 4.5vw, 4.25rem); /* ~32px to ~68px */
+    line-height: 1.05;
     letter-spacing: -0.02em;
+    font-weight: 500;
+  }
+
+  .ds-heading-md {
+    font-family: "Clash Display", sans-serif;
+    font-size: clamp(1.5rem, 3.5vw, 2.625rem); /* ~24px to ~42px */
+    line-height: 1.1;
+    letter-spacing: -0.01em;
     font-weight: 600;
+  }
+
+  .ds-body-lg {
+    font-family: "Clash Grotesk", sans-serif;
+    font-size: clamp(1.125rem, 2vw, 1.625rem); /* ~18px to ~26px */
+    line-height: 1.4;
+    letter-spacing: 0;
+    font-weight: 400;
+  }
+
+  .ds-body {
+    font-family: "Clash Grotesk", sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
   }
 
   .ds-body {

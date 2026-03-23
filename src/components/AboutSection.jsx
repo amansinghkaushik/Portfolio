@@ -45,16 +45,17 @@ function AboutSection() {
 
       gsap.fromTo(
         '.about-animate-block',
-        { y: 42, opacity: 0 },
+        { y: 60, opacity: 0, scale: 0.95 },
         {
           y: 0,
           opacity: 1,
-          duration: 0.9,
-          stagger: 0.14,
-          ease: 'power3.out',
+          scale: 1,
+          duration: 1.2,
+          stagger: 0.15,
+          ease: 'power4.out',
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: 'top 70%',
+            start: 'top 55%',
           },
         },
       )
@@ -64,18 +65,18 @@ function AboutSection() {
   }, [])
 
   return (
-    <section ref={sectionRef} className="ds-section bg-[#ececec] pt-8">
+    <section ref={sectionRef} id="about" className="ds-section bg-[#ececec] pt-8">
       <div className="ds-container">
         <div className="about-animate-head mb-16 flex items-center justify-between">
-          <p className="text-8xl font-bold tracking-[0.01em] lowercase">about.</p>
+          <p className="ds-heading-xl lowercase">about.</p>
         </div>
 
-        <p className="about-animate-lead mb-12 max-w-2xl text-2xl font-semibold leading-[1.12] tracking-[-0.02em] text-[#141414]">
+        <p className="about-animate-lead mb-12 max-w-2xl ds-heading-md text-[#141414]">
           I'm an engineering student building at the intersection of UI/UX, web development,
           branding, illustration, and logo design.
         </p>
 
-        <div className="flex items-center gap-20 ">
+        <div className="flex items-center pl-56 gap-20 ">
           <img
             src={me}
             alt="Creative professional"
@@ -83,11 +84,11 @@ function AboutSection() {
           />
           <div className="about-animate-block space-y-4">
             <p className="ds-eyebrow">Hybrid Artist + Designer</p>
-            <p className="ds-body max-w-md">
+            <p className="text-2xl font-medium max-w-md">
               I started with traditional sketching, anatomy studies, and character design, then
               evolved into digital product design, interaction systems, and brand storytelling.
             </p>
-            <p className="ds-body max-w-md">
+            <p className="text-2xl font-medium max-w-md">
               My focus is creating experiences that feel expressive like art and functional like
               engineering.
             </p>

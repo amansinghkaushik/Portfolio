@@ -3,7 +3,7 @@ import FooterSection from './FooterSection'
 
 export default function ContactPage() {
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col">
+    <div  className="min-h-screen bg-black text-white flex flex-col">
       <Navbar />
       <main className="flex-1 flex flex-col justify-center items-center px-4 pt-32 pb-16">
         <div className="w-full max-w-7xl mx-auto">

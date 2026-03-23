@@ -30,6 +30,23 @@ function Navbar() {
     return () => clearInterval(interval)
   }, [])
 
+  const handleNavClick = (e, targetId) => {
+    setIsOpen(false)
+    if (window.location.pathname === '/' || window.location.pathname === '') {
+      e.preventDefault()
+      const element = document.getElementById(targetId)
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' })
+        // Update URL hash without jumping
+        window.history.pushState(null, '', `/#${targetId}`)
+      } else {
+        window.location.href = `/#${targetId}`
+      }
+    } else {
+      // If not on the homepage, let the browser hard navigate back to the home page anchors
+    }
+  }
+
   return (
     <nav className="fixed top-0 left-0 right-0 border-b border-black/10 bg-black px-[30px] z-60">
       {/* Inner NavBar */}
@@ -53,32 +70,34 @@ function Navbar() {
             }`}
             style={{ display: isOpen ? 'flex' : 'none' }}
           >
-            <Link
-              to="/"
-              className="text-sm font-medium hover:opacity-70 transition-opacity duration-300"
-              onClick={() => setIsOpen(false)}
+            <a
+              href="/#hero"
+              className="font-clash-grotesk text-sm font-medium hover:opacity-70 transition-opacity duration-300"
+              onClick={(e) => handleNavClick(e, 'hero')}
             >
               Home
-            </Link>
+            </a>
             <a
-              href="#works"
-              className="text-sm font-medium hover:opacity-70 transition-opacity duration-300"
+              href="/#work"
+              className="font-clash-grotesk text-sm font-medium hover:opacity-70 transition-opacity duration-300"
+              onClick={(e) => handleNavClick(e, 'work')}
             >
               Works
             </a>
             <a
-              href="#about"
-              className="text-sm font-medium hover:opacity-70 transition-opacity duration-300"
+              href="/#about"
+              className="font-clash-grotesk text-sm font-medium hover:opacity-70 transition-opacity duration-300"
+              onClick={(e) => handleNavClick(e, 'about')}
             >
               About
             </a>
-            <Link
-              to="/contact"
-              className="text-sm font-medium hover:opacity-70 transition-opacity duration-300"
-              onClick={() => setIsOpen(false)}
+            <a
+              href="/#contact"
+              className="font-clash-grotesk text-sm font-medium hover:opacity-70 transition-opacity duration-300"
+              onClick={(e) => handleNavClick(e, 'contact')}
             >
               Contact
-            </Link>
+            </a>
           </div>
           <div className="transition-all duration-400 ease-in-out">
             <MenuButton
