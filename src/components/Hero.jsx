@@ -429,15 +429,15 @@ function Hero() {
         </section>
 
         {/* ── Static bento section, just scrolls normally ─────────────────── */}
-        <div className="relative z-[1] bg-black h-full flex flex-col gap-4 px-4 pt-4 pb-12">
+        <div className="relative z-[1] bg-black flex flex-col gap-4 md:grid md:grid-cols-3 md:grid-rows-6 md:gap-4 px-4 pt-4 pb-12">
 
           {/* CTA – yellow */}
-          <div className="relative overflow-hidden rounded-xl bg-[#ece868] p-5 text-[#101010] flex flex-col justify-between min-h-[160px]">
-            <div>
-              <p className="font-clash-display text-[1.1rem] leading-tight font-medium">
-                Got an <span className="italic font-serif">idea</span>? Don't let it rest.
+          <div className="relative overflow-hidden rounded-xl bg-[#ece868] p-5 text-[#101010] flex flex-col justify-between min-h-[160px] md:col-span-1 md:row-span-2 transition-transform duration-300 hover:scale-[1.02] hover:shadow-lg">
+            <div className="max-w-[240px]">
+              <p className="font-clash-display text-[1.1rem] md:text-[1.75rem] md:leading-[1.1] leading-tight tracking-[-0.02em] font-medium">
+                Got an <span className="italic font-serif font-medium">idea</span>? Don't let it rest.
               </p>
-              <p className="mt-2 font-clash-grotesk text-base text-black/80">Let's start working on it.</p>
+              <p className="mt-2 font-clash-grotesk text-base md:text-lg text-black/80">Let's start working on it.</p>
             </div>
             <Link to="/contact" className="mt-4 ml-auto flex w-fit items-center rounded-lg gap-1 border border-black/40 bg-[#efedb7] px-3 py-2 text-xs font-medium text-black/70">
               <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -449,74 +449,77 @@ function Hero() {
           </div>
 
           {/* About – blue */}
-          <div className="rounded-xl bg-[#eaf2ff] p-5 text-[#12305f] flex flex-col gap-4">
-            <p className="font-clash-grotesk text-lg leading-[1.4] text-[#143467]">
+          <div className="rounded-xl bg-[#eaf2ff] p-5 md:p-7 text-[#12305f] flex flex-col md:flex-row gap-4 md:gap-8 md:items-center md:col-span-2 md:row-span-2 transition-transform duration-300 hover:scale-[1.02] hover:shadow-lg">
+            <p className="font-clash-grotesk text-lg md:text-[1.35rem] flex-1 leading-[1.4] text-[#143467]">
               As an engineering student and digital designer, I specialize in crafting meaningful UI/UX experiences, visual identities, and logo systems.
             </p>
-            <img className="h-28 w-28 object-contain" src={astrick} alt="Asterisk" />
+            <img className="h-28 w-28 md:h-48 md:w-48 object-contain transition-transform duration-700" src={astrick} alt="Asterisk" />
           </div>
 
-          {/* Tools strip */}
-          <div className="relative overflow-hidden rounded-xl bg-[#72e6cc] px-4 py-4 flex items-center min-h-[80px]">
-            <motion.div 
-              className="flex items-center gap-8 whitespace-nowrap"
-              animate={{ x: ['0%', '-50%'] }}
-              transition={{ duration: 15, ease: 'linear', repeat: Infinity }}
-            >
-              {[...toolIcons, ...toolIcons, ...toolIcons].map((icon, index) => (
-                <div key={`tool-mobile-${icon.alt}-${index}`}>
-                  <img src={icon.src} alt={icon.alt} className="h-12 w-12 rounded-xl object-contain drop-shadow-sm" />
-                </div>
+          {/* Tools + Social column */}
+          <div className="flex flex-col gap-4 md:gap-3 md:row-span-2 md:col-span-1">
+            {/* Tools strip */}
+            <div className="relative flex-1 overflow-hidden rounded-xl bg-[#72e6cc] px-4 py-4 md:py-0 flex items-center min-h-[80px] md:min-h-[120px]">
+              <motion.div 
+                className="flex items-center gap-8 md:gap-10 whitespace-nowrap"
+                animate={{ x: ['0%', '-50%'] }}
+                transition={{ duration: 15, ease: 'linear', repeat: Infinity }}
+              >
+                {[...toolIcons, ...toolIcons, ...toolIcons].map((icon, index) => (
+                  <div key={`tool-mobile-${icon.alt}-${index}`}>
+                    <img src={icon.src} alt={icon.alt} className="h-12 w-12 md:h-14 md:w-14 rounded-xl md:rounded-2xl object-contain drop-shadow-sm md:drop-shadow-md" />
+                  </div>
+                ))}
+              </motion.div>
+            </div>
+
+            {/* Social icons */}
+            <div className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#7cc4ff] py-4">
+              {communityIcons.map((icon) => (
+                <a key={icon.alt} href={icon.link} target="_blank" rel="noopener noreferrer" className="grid h-14 w-14 place-items-center transition-transform duration-200 hover:scale-125 hover:-translate-y-1">
+                  <img src={icon.src} alt={icon.alt} className="h-10 w-10 rounded-2xl object-contain shadow-sm" />
+                </a>
               ))}
-            </motion.div>
-          </div>
-
-          {/* Social icons */}
-          <div className="flex items-center justify-center gap-2 rounded-xl bg-[#7cc4ff] py-4">
-            {communityIcons.map((icon) => (
-              <a key={icon.alt} href={icon.link} target="_blank" rel="noopener noreferrer" className="grid h-14 w-14 place-items-center">
-                <img src={icon.src} alt={icon.alt} className="h-10 w-10 rounded-2xl object-contain shadow-sm" />
-              </a>
-            ))}
+            </div>
           </div>
 
           {/* Stats */}
-          <div className="rounded-xl bg-[#eaf2ff] py-6 px-6">
-            <div className="grid grid-cols-2 gap-y-6 gap-x-4">
+          <div className="rounded-xl bg-[#eaf2ff] py-6 px-6 md:p-4 md:col-span-1 md:row-span-2 transition-colors duration-300 hover:bg-white hover:shadow-lg flex items-center justify-center">
+            <div className="grid grid-cols-2 gap-y-6 gap-x-4 md:grid-cols-2 md:grid-rows-2 md:gap-x-6 md:gap-y-6 h-full w-full max-w-[480px] md:px-4 md:py-4">
               {[['1+', 'Years experience'], ['3+', 'Projects completed'], ['3+', 'Happy clients'], ['98%', 'On-time delivery']].map(([num, label]) => (
-                <div key={label} className="flex flex-col">
-                  <p className="font-clash-display text-2xl font-semibold tracking-tight">{num}</p>
-                  <p className="mt-1 text-sm font-medium text-[#5c6375]">{label}</p>
+                <div key={label} className="group flex flex-col items-start justify-center text-left transition-transform duration-300 hover:scale-105 hover:translate-x-1">
+                  <p className="font-clash-display text-2xl md:text-3xl font-semibold tracking-tight">{num}</p>
+                  <p className="mt-1 text-sm font-medium leading-[1.1] text-[#5c6375]">{label}</p>
                 </div>
               ))}
             </div>
           </div>
 
           {/* What I Offer */}
-          <div className="rounded-xl bg-[#eaf2ff] p-5 text-[#12305f]">
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-xl font-light font-serif italic text-[#143467]">What I Offer</p>
-              <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 256 256" fill="none" aria-hidden="true">
+          <div className="rounded-xl bg-[#eaf2ff] p-5 text-[#12305f] md:col-span-1 md:col-start-3 md:row-span-4 md:row-start-3 flex flex-col justify-between">
+            <div className="flex items-center justify-between mb-4 md:px-4 md:py-3">
+              <p className="text-xl md:text-3xl font-light leading-tight tracking-wider font-serif italic text-[#143467]">What <br className="hidden md:inline" />I Offer</p>
+              <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 256 256" fill="none" className="md:h-[4.75rem] md:w-[4.75rem] shrink-0" aria-hidden="true">
                 <path d="M152 70.059L201.539 20.519L235.48 54.461L185.941 104H256V152H185.941L235.48 201.539L201.539 235.48L152 185.941V256H104V185.941L54.46 235.48L20.52 201.539L70.059 152H0V104H70.059L20.519 54.46L54.461 20.52L104 70.059V0H152Z" fill="rgb(0,0,84)" />
               </svg>
             </div>
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1 md:gap-1.5">
               {[['BR', 'Branding'], ['UX', 'UI/UX Design'], ['IL', 'Illustration'], ['WD', 'Web Development'], ['VI', 'Visual Identity']].map(([code, label]) => (
-                <div key={code} className="flex items-center gap-3 px-2 py-2">
+                <div key={code} className="flex items-center gap-3 rounded-[14px] px-2 md:px-3 py-2 md:py-3">
                   <span className="grid h-8 w-8 place-items-center rounded-[10px] bg-[#bfdbfe] text-xs font-semibold text-[#1e3a8a]">{code}</span>
-                  <p className="text-base font-medium text-[#143467]">{label}</p>
+                  <p className="text-base md:text-[1.15rem] font-medium text-[#143467]">{label}</p>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Projects mockup */}
-          <a href="#work" className="relative overflow-hidden rounded-xl block min-h-[220px] cursor-pointer">
-            <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${taglineMockup})` }} />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-            <div className="absolute bottom-5 right-6 flex items-center gap-3">
-              <p className="text-right font-clash-display text-3xl font-semibold text-white">Projects</p>
-              <img src={arrowIcon} alt="" className="h-8 w-8 brightness-0 rotate-90 invert" />
+          <a href="#work" className="group relative overflow-hidden rounded-xl block min-h-[220px] md:min-h-[80px] cursor-pointer md:col-span-2 md:row-span-2 transition-shadow duration-300 hover:shadow-xl">
+            <div className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-700 ease-out group-hover:scale-110" style={{ backgroundImage: `url(${taglineMockup})` }} />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent transition-opacity duration-300 group-hover:from-black/80" />
+            <div className="absolute bottom-5 right-6 flex items-center gap-3 md:gap-4 md:translate-y-4 md:opacity-0 md:transition-all md:duration-500 md:ease-out md:group-hover:translate-y-0 md:group-hover:opacity-100">
+              <p className="text-right font-clash-display text-3xl md:text-4xl font-semibold text-white">Projects</p>
+              <img src={arrowIcon} alt="" className="h-8 w-8 md:h-10 md:w-10 brightness-0 rotate-90 invert transition-transform duration-500 group-hover:translate-x-2" />
             </div>
           </a>
         </div>
