@@ -76,19 +76,19 @@ function AboutSection() {
           branding, illustration, and logo design.
         </p>
 
-        <div className="flex items-center pl-56 gap-20 ">
+        <div className="flex flex-col lg:flex-row items-center lg:pl-56 gap-10 lg:gap-20">
           <img
             src={me}
             alt="Creative professional"
-            className="about-animate-block h-[600px] w-[600px] object-cover"
+            className="about-animate-block w-full max-w-[600px] h-auto lg:h-[600px] object-cover rounded-xl"
           />
           <div className="about-animate-block space-y-4">
             <p className="ds-eyebrow">Hybrid Artist + Designer</p>
-            <p className="text-2xl font-medium max-w-md">
+            <p className="text-xl lg:text-2xl font-medium max-w-md">
               I started with traditional sketching, anatomy studies, and character design, then
               evolved into digital product design, interaction systems, and brand storytelling.
             </p>
-            <p className="text-2xl font-medium max-w-md">
+            <p className="text-xl lg:text-2xl font-medium max-w-md">
               My focus is creating experiences that feel expressive like art and functional like
               engineering.
             </p>

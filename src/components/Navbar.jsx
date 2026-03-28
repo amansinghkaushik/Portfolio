@@ -50,12 +50,12 @@ function Navbar() {
   }
 
   return (
-    <nav className="fixed top-0 left-0 right-0 border-b border-black/10 bg-black px-[30px] z-60">
+    <nav className="fixed top-0 left-0 right-0 border-b border-black/10 bg-black px-4 md:px-[30px] z-[100]">
       {/* Inner NavBar */}
-      <div className="flex items-center justify-between py-[10px] text-white">
+      <div className="flex items-center justify-between py-[10px] text-white relative">
 
         {/* DateTimeDisplay or Back Button */}
-        <div className="flex-1 font-inter text-sm font-medium text-white flex items-center">
+        <div className="flex-1 font-inter text-sm font-medium text-white hidden md:flex items-center">
           {isContactPage ? (
             <Link to="/" className="flex items-center gap-2 hover:text-white/70 transition-colors">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -76,34 +76,36 @@ function Navbar() {
         {/* Element 3 - Menu Button or Navigation */}
         <div className="flex-1 flex justify-end items-center gap-7">
           <div
-            className={`flex items-center gap-7 overflow-hidden ${
-              isOpen ? 'animate-menu-open' : 'animate-menu-close'
-            }`}
-            style={{ display: isOpen ? 'flex' : 'none' }}
+            className={`
+              fixed top-[52px] left-0 right-0 bg-black border-b border-white/10 flex-col items-center gap-6 py-6 pb-12
+              md:static md:w-auto md:bg-transparent md:border-none md:flex-row md:py-0
+              transition-all duration-300 ease-in-out
+              ${isOpen ? 'flex' : 'hidden'} md:!flex
+            `}
           >
             <a
               href="/#work"
-              className="font-clash-grotesk text-sm font-medium hover:opacity-70 transition-opacity duration-300"
+              className="font-clash-grotesk text-lg md:text-sm font-medium hover:opacity-70 transition-opacity duration-300"
               onClick={(e) => handleNavClick(e, 'work')}
             >
               Works
             </a>
             <a
               href="/#about"
-              className="font-clash-grotesk text-sm font-medium hover:opacity-70 transition-opacity duration-300"
+              className="font-clash-grotesk text-lg md:text-sm font-medium hover:opacity-70 transition-opacity duration-300"
               onClick={(e) => handleNavClick(e, 'about')}
             >
               About
             </a>
             <Link
               to="/contact"
-              className="font-clash-grotesk text-sm font-medium hover:opacity-70 transition-opacity duration-300"
+              className="font-clash-grotesk text-lg md:text-sm font-medium hover:opacity-70 transition-opacity duration-300"
               onClick={() => setIsOpen(false)}
             >
               Contact
             </Link>
           </div>
-          <div className="transition-all duration-400 ease-in-out">
+          <div className="transition-all duration-400 ease-in-out z-50">
             <MenuButton
               variant={isOpen ? 'open' : 'closed'}
               onClick={() => setIsOpen((current) => !current)}

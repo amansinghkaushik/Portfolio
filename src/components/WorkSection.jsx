@@ -80,7 +80,7 @@ function WorkSection() {
         </div>
 
         <div className="relative mt-8">
-          <div className="relative w-full overflow-hidden rounded-xl h-[650px] sm:h-[800px] lg:h-[950px]">
+          <div className="relative w-full overflow-hidden rounded-xl h-[800px] sm:h-[800px] lg:h-[950px]">
             <div className="grid gap-4 sm:grid-cols-2 pb-32">
               {workCards.map((card) => (
                 <article key={card.title} className="work-animate-card group relative aspect-square overflow-hidden bg-white rounded-xl">

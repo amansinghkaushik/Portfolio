@@ -54,7 +54,7 @@ function ExperienceSection() {
   }, [])
 
   return (
-    <section ref={sectionRef} className="ds-section bg-[#f5f5f7] pt-0 pb-32">
+    <section ref={sectionRef} className="ds-section bg-[#f5f5f7] pt-0 pb-20 lg:pb-32">
       <div className="ds-container">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-16 md:gap-8">
           

@@ -47,7 +47,7 @@ function TestimonialSection() {
   }, [])
 
   return (
-    <section ref={sectionRef} className="ds-section bg-white py-32 relative overflow-hidden">
+    <section ref={sectionRef} className="ds-section bg-white py-20 lg:py-32 relative overflow-hidden">
       <div className="ds-container">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 relative">
           
@@ -58,7 +58,7 @@ function TestimonialSection() {
             <div key={index} className="test-animate flex flex-col relative pr-8">
               
               {/* Quote Icon */}
-              <div className="absolute -right-4 top-0 opacity-10 font-serif text-[8rem] leading-none pointer-events-none select-none">
+              <div className="absolute right-0 top-0 opacity-10 font-serif text-[8rem] leading-none pointer-events-none select-none">
                 "
               </div>
               

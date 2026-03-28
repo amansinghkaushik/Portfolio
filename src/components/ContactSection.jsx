@@ -6,8 +6,8 @@ export default function ContactSection() {
       <div className="ds-container flex flex-col md:flex-row gap-12 items-start justify-between">
         {/* Left: Info */}
         <div className="flex-1 max-w-xl">
-          <h2 className="text-5xl md:text-6xl font-bold mb-4 leading-tight text-black">
-            Get in <span className="inline-block w-12 align-middle border-t-4 border-black mx-2" /> touch with us
+          <h2 className="text-4xl md:text-6xl font-bold mb-4 leading-tight text-black">
+            Get in <span className="inline-block w-8 md:w-12 align-middle border-t-4 border-black mx-2" /> touch with us
           </h2>
           <p className="text-lg text-[#444] mb-8">
             We’re here to help! Whether you have a question about our services, need assistance with your account, or want to provide feedback, our team is ready to assist you.

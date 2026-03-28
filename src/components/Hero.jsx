@@ -41,6 +41,13 @@ function Hero() {
   const [isReady, setIsReady] = useState(false)
   const [videoDuration, setVideoDuration] = useState(0)
   const [isToolsHovered, setIsToolsHovered] = useState(false)
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 1024)
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024)
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   const getSectionProgress = () => {
     if (!sectionRef.current) return 0
@@ -97,6 +104,7 @@ function Hero() {
   const isImageExpanded = progress >= imageExpandStart
   const isSocialVisible = progress >= socialStart
   const isBentoVisible = progress >= bentoStart
+  const bentoScrollProgress = clamp((progress - bentoStart) / (1 - bentoStart), 0, 1)
   const bottomBarDismissStart = Math.max(shapeRiseStart, shapeRiseEnd - 0.05)
   const bottomBarDismissProgress = clamp((progress - bottomBarDismissStart) / 0.008, 0, 1)
   const bottomBarTranslateY = isImageExpanded ? 100 : bottomBarDismissProgress * 100
@@ -205,19 +213,19 @@ function Hero() {
     // Staggered letters for 'Design.'
     designWordRefs.current.forEach((el, index) => {
       if (!el) return
-      
+
       const letterFadeInStart = textFadeInStart + (index * 0.003)
       const letterFadeInEnd = letterFadeInStart + 0.04
-      
+
       const letterFadeOutStart = textFadeOutStart + (index * 0.003)
       const letterFadeOutEnd = letterFadeOutStart + 0.04
 
       const fadeInProg = clamp((progress - letterFadeInStart) / (letterFadeInEnd - letterFadeInStart), 0, 1)
       const fadeOutProg = clamp((progress - letterFadeOutStart) / (letterFadeOutEnd - letterFadeOutStart), 0, 1)
-      
+
       let letterOpacity = 0
       let letterY = 30
-      
+
       if (progress >= letterFadeInStart && progress < letterFadeOutEnd) {
         if (progress < letterFadeOutStart) {
           letterOpacity = fadeInProg
@@ -227,7 +235,7 @@ function Hero() {
           letterY = -30 * fadeOutProg
         }
       }
-      
+
       gsap.set(el, {
         opacity: letterOpacity,
         y: letterY,
@@ -266,7 +274,7 @@ function Hero() {
   }, [videoDuration])
 
   useEffect(() => {
-    if (!sectionRef.current) return
+    if (!sectionRef.current || isMobile) return
 
     const holdTrigger = ScrollTrigger.create({
       trigger: sectionRef.current,
@@ -284,6 +292,238 @@ function Hero() {
     }
   }, [])
 
+  // ── Mobile: Animated scenes then static bento below ──────────────────────
+  if (isMobile) {
+    return (
+      <>
+        {/* ── Scroll-driven scenes section (portrait, PORTFOLIO text, video, overlays) ── */}
+        <section
+          id="hero"
+          ref={sectionRef}
+          className="relative z-10 h-[350vh] w-full"
+          style={{ backgroundColor: '#ececec' }}
+        >
+          <div
+            className={`sticky top-[56px] flex flex-col h-[calc(100dvh-56px)] w-full overflow-hidden bg-[#ececec] ${transitionClass} ${isSocialVisible ? 'px-4 py-4' : 'px-0 py-0'}`}
+          >
+            {/* Black circle */}
+            <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
+              <div
+                className="absolute inset-0 bg-black"
+                style={{
+                  clipPath: `circle(${shapeRadiusPercent}% at 50% 50%)`,
+                  WebkitClipPath: `circle(${shapeRadiusPercent}% at 50% 50%)`,
+                }}
+              />
+            </div>
+
+            {/* PORTFOLIO background text */}
+            <div className="pointer-events-none absolute inset-0 z-0 w-full h-full">
+              <div className="absolute left-1/2 top-[60%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center w-full px-4">
+                <div className="absolute -top-16 select-none w-full">
+                  <div ref={welcomeRef} className="font-gochi-hand text-4xl uppercase tracking-[0.02em] text-[#1d4ed8] opacity-80 text-center">
+                    Welcome to my
+                  </div>
+                </div>
+                <motion.div
+                  className="font-condenso select-none text-[400px] uppercase tracking-[0.02em] text-transparent opacity-70 flex flex-col items-center text-center max-w-[100vw]"
+                  style={{
+                    WebkitTextStroke: '1px #23242a',
+                    lineHeight: 0.75,
+                    paddingTop: '0.01em',
+                    WebkitMaskImage: 'linear-gradient(to bottom, #000 18%, rgba(0,0,0,0.18) 62%, rgba(0,0,0,0.03) 84%, transparent 100%)',
+                    maskImage: 'linear-gradient(to bottom, #000 18%, rgba(0,0,0,0.18) 62%, rgba(0,0,0,0.03) 84%, transparent 100%)',
+                  }}
+                >
+                  {portfolioWordGroups.map((group, index) => (
+                    <motion.span key={group} ref={(el) => { portfolioWordRefs.current[index] = el }} className="block">
+                      {group}
+                    </motion.span>
+                  ))}
+                </motion.div>
+              </div>
+            </div>
+
+            {/* Portrait area — fills all remaining height */}
+            <div className={`relative z-10 flex-1 flex flex-col overflow-hidden ${transitionClass} ${isSocialVisible ? 'rounded-xl' : 'rounded-none'}`}>
+              <div className={`relative flex-1 h-full origin-bottom overflow-hidden ${transitionClass} ${isSocialVisible ? 'bg-[#d8d6d8] rounded-xl mb-3' : 'bg-transparent rounded-none mb-0'}`}>
+                <img
+                  src={amanBg}
+                  alt="Portrait"
+                  className={`pointer-events-none absolute bottom-0 left-1/2 z-20 h-[55vh] w-auto max-w-none -translate-x-1/2 origin-bottom object-cover ${isImageExpanded ? 'scale-100' : 'scale-[0.85]'}`}
+                />
+                {/* Video scrub */}
+                <div
+                  className="pointer-events-none absolute inset-0 z-0 overflow-hidden transition-opacity duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] flex items-end justify-center"
+                  style={{ opacity: videoOpacity }}
+                >
+                  <video
+                    ref={videoRef}
+                    src={heroVideo}
+                    muted
+                    playsInline
+                    preload="auto"
+                    onLoadedMetadata={(event) => {
+                      setVideoDuration(event.currentTarget.duration || 0)
+                      smoothedVideoTimeRef.current = 0
+                      targetVideoTimeRef.current = 0
+                    }}
+                    className="max-h-[85vh] opacity-80 w-full object-cover origin-bottom"
+                    style={{ transform: 'rotateY(180deg)' }}
+                  />
+                </div>
+              </div>
+
+              {/* Mid-scroll text overlay */}
+              <div
+                className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center text-center"
+                style={{ opacity: textOpacity }}
+              >
+                <div className="absolute left-4 bottom-16 max-w-[260px] text-left text-white">
+                  <p className="text-xs uppercase tracking-[0.24em] text-white/70">Now Creating</p>
+                  <p className="mt-2 text-base leading-relaxed text-white/90">Ideas into campaigns, interfaces, and motion stories that feel handcrafted and unforgettable.</p>
+                </div>
+                <div className="absolute top-8 left-4 text-left text-white max-w-[260px]">
+                  <h1 className="text-4xl font-regular leading-8 tracking-tighter">Built</h1>
+                  <p className="pl-4 text-xl font-serif font-extralight italic tracking-tighter text-white/95">from instinct,</p>
+                </div>
+                <div className="absolute bottom-40 right-4 max-w-fit text-right text-white">
+                  <p className="text-xl leading-[1.2] font-medium text-white/95 mb-1">refined by</p>
+                  <h1 className="text-4xl font-regular italic font-serif tracking-tight">
+                    {['D', 'e', 's', 'i', 'g', 'n', '.'].map((char, index) => (
+                      <span key={index} ref={(el) => designWordRefs.current[index] = el} className="inline-block">{char}</span>
+                    ))}
+                  </h1>
+                </div>
+              </div>
+
+              {/* Name card */}
+              <motion.div
+                initial={false}
+                animate={isSocialVisible ? { height: 'auto', y: 0, opacity: 1 } : { height: 0, y: -28, opacity: 0 }}
+                transition={{ duration: isReady ? 1.3 : 0, ease: [0.16, 1, 0.3, 1] }}
+                className={isSocialVisible ? 'overflow-hidden' : 'pointer-events-none overflow-hidden'}
+              >
+                <div className="flex items-center justify-center rounded-xl bg-[#d8d3e9] px-6 py-7 text-[#43396d]">
+                  <p className="text-3xl font-light font-serif italic tracking-wide">Aman Singh Kaushik</p>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Bottom bar */}
+            <div
+              className="absolute inset-x-0 bottom-0 z-40 w-full bg-black px-4 pt-1 pb-2 text-white transition-transform duration-300 ease-out"
+              style={{ transform: `translateY(${bottomBarTranslateY}%)`, opacity: bottomBarOpacity }}
+            >
+              <div className="flex items-center justify-between py-1">
+                <p className="text-sm font-semibold uppercase tracking-[0.12em] leading-[0.1] flex-1">
+                  <span className="font-gochi-hand text-2xl">ASK</span><br />
+                  <span className="pl-1 text-sm leading-0.5 tracking-tighter">CREATIONS</span>
+                </p>
+                <Link to="/contact" className="bg-white px-5 py-2.5 text-[11px] font-semibold text-black hover:bg-zinc-200 whitespace-nowrap block text-center">
+                  Get in Touch
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Static bento section, just scrolls normally ─────────────────── */}
+        <div className="relative z-[1] bg-black h-full flex flex-col gap-4 px-4 pt-4 pb-12">
+
+          {/* CTA – yellow */}
+          <div className="relative overflow-hidden rounded-xl bg-[#ece868] p-5 text-[#101010] flex flex-col justify-between min-h-[160px]">
+            <div>
+              <p className="font-clash-display text-[1.1rem] leading-tight font-medium">
+                Got an <span className="italic font-serif">idea</span>? Don't let it rest.
+              </p>
+              <p className="mt-2 font-clash-grotesk text-base text-black/80">Let's start working on it.</p>
+            </div>
+            <Link to="/contact" className="mt-4 ml-auto flex w-fit items-center rounded-lg gap-1 border border-black/40 bg-[#efedb7] px-3 py-2 text-xs font-medium text-black/70">
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <rect x="9" y="9" width="11" height="11" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+              </svg>
+              Get in Touch
+            </Link>
+            <img src={arrowIcon} alt="" className="absolute bottom-5 left-5 h-12 w-12 opacity-80" />
+          </div>
+
+          {/* About – blue */}
+          <div className="rounded-xl bg-[#eaf2ff] p-5 text-[#12305f] flex flex-col gap-4">
+            <p className="font-clash-grotesk text-lg leading-[1.4] text-[#143467]">
+              As an engineering student and digital designer, I specialize in crafting meaningful UI/UX experiences, visual identities, and logo systems.
+            </p>
+            <img className="h-28 w-28 object-contain" src={astrick} alt="Asterisk" />
+          </div>
+
+          {/* Tools strip */}
+          <div className="relative overflow-hidden rounded-xl bg-[#72e6cc] px-4 py-4 flex items-center min-h-[80px]">
+            <motion.div 
+              className="flex items-center gap-8 whitespace-nowrap"
+              animate={{ x: ['0%', '-50%'] }}
+              transition={{ duration: 15, ease: 'linear', repeat: Infinity }}
+            >
+              {[...toolIcons, ...toolIcons, ...toolIcons].map((icon, index) => (
+                <div key={`tool-mobile-${icon.alt}-${index}`}>
+                  <img src={icon.src} alt={icon.alt} className="h-12 w-12 rounded-xl object-contain drop-shadow-sm" />
+                </div>
+              ))}
+            </motion.div>
+          </div>
+
+          {/* Social icons */}
+          <div className="flex items-center justify-center gap-2 rounded-xl bg-[#7cc4ff] py-4">
+            {communityIcons.map((icon) => (
+              <a key={icon.alt} href={icon.link} target="_blank" rel="noopener noreferrer" className="grid h-14 w-14 place-items-center">
+                <img src={icon.src} alt={icon.alt} className="h-10 w-10 rounded-2xl object-contain shadow-sm" />
+              </a>
+            ))}
+          </div>
+
+          {/* Stats */}
+          <div className="rounded-xl bg-[#eaf2ff] py-6 px-6">
+            <div className="grid grid-cols-2 gap-y-6 gap-x-4">
+              {[['1+', 'Years experience'], ['3+', 'Projects completed'], ['3+', 'Happy clients'], ['98%', 'On-time delivery']].map(([num, label]) => (
+                <div key={label} className="flex flex-col">
+                  <p className="font-clash-display text-2xl font-semibold tracking-tight">{num}</p>
+                  <p className="mt-1 text-sm font-medium text-[#5c6375]">{label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* What I Offer */}
+          <div className="rounded-xl bg-[#eaf2ff] p-5 text-[#12305f]">
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-xl font-light font-serif italic text-[#143467]">What I Offer</p>
+              <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 256 256" fill="none" aria-hidden="true">
+                <path d="M152 70.059L201.539 20.519L235.48 54.461L185.941 104H256V152H185.941L235.48 201.539L201.539 235.48L152 185.941V256H104V185.941L54.46 235.48L20.52 201.539L70.059 152H0V104H70.059L20.519 54.46L54.461 20.52L104 70.059V0H152Z" fill="rgb(0,0,84)" />
+              </svg>
+            </div>
+            <div className="flex flex-col gap-1">
+              {[['BR', 'Branding'], ['UX', 'UI/UX Design'], ['IL', 'Illustration'], ['WD', 'Web Development'], ['VI', 'Visual Identity']].map(([code, label]) => (
+                <div key={code} className="flex items-center gap-3 px-2 py-2">
+                  <span className="grid h-8 w-8 place-items-center rounded-[10px] bg-[#bfdbfe] text-xs font-semibold text-[#1e3a8a]">{code}</span>
+                  <p className="text-base font-medium text-[#143467]">{label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Projects mockup */}
+          <a href="#work" className="relative overflow-hidden rounded-xl block min-h-[220px] cursor-pointer">
+            <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${taglineMockup})` }} />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+            <div className="absolute bottom-5 right-6 flex items-center gap-3">
+              <p className="text-right font-clash-display text-3xl font-semibold text-white">Projects</p>
+              <img src={arrowIcon} alt="" className="h-8 w-8 brightness-0 rotate-90 invert" />
+            </div>
+          </a>
+        </div>
+      </>
+    )
+  }
+
   return (
     <section
       id="hero"
@@ -291,9 +531,9 @@ function Hero() {
       className="relative z-0 h-[850vh] w-full"
       style={{ backgroundColor: '#ececec' }}
     >
+
       <div
-        className={`sticky top-[56px] flex h-[calc(100vh-56px)] w-full items-center justify-center ${transitionClass} ${isSocialVisible ? 'px-[30px] py-[30px]' : 'px-0 py-0'
-          }`}
+        className={`sticky top-[56px] w-full flex items-center justify-center ${transitionClass} ${isSocialVisible ? 'px-[30px] py-[30px]' : 'px-0 py-0'} ${isBentoVisible ? 'h-auto overflow-visible lg:h-[calc(100dvh-56px)] lg:overflow-hidden' : 'h-[calc(100dvh-56px)] overflow-hidden'}`}
       >
         <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
           <div
@@ -305,18 +545,18 @@ function Hero() {
           />
         </div>
 
-        <div className="pointer-events-none absolute inset-0 z-0 overflow-visible">
-          <div className="absolute left-1/2 top-[45%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-start">
-            <div className=" absolute -top-8  select-none w-full">
-              <div ref={welcomeRef} className="font-gochi-hand text-6xl uppercase tracking-[0.02em] text-[#1d4ed8] opacity-80 text-left ">
+        <div className="pointer-events-none absolute inset-0 z-0 w-full h-full">
+          <div className="absolute left-1/2 top-[60%] lg:top-[55%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center lg:items-start w-full px-4 lg:w-auto lg:px-0">
+            <div className="absolute -top-16 lg:-top-8 select-none w-full">
+              <div ref={welcomeRef} className="font-gochi-hand text-4xl sm:text-5xl lg:text-6xl uppercase tracking-[0.02em] text-[#1d4ed8] opacity-80 text-center lg:text-left">
                 Welcome to my
               </div>
             </div>
             <motion.div
-              className="font-condenso select-none whitespace-nowrap text-[550px] uppercase tracking-[0.02em] text-transparent opacity-70"
+              className="font-condenso select-none text-[110vw] sm:text-[90vw] md:text-[200px] lg:text-[400px] xl:text-[550px] uppercase tracking-[0.02em] text-transparent opacity-70 flex flex-col lg:flex-row items-center justify-center lg:items-start text-center max-w-[100vw]"
               style={{
-                WebkitTextStroke: '3.5px #23242a', // darker outline
-                lineHeight: 0.9,
+                WebkitTextStroke: '1px #23242a', // lighter outline
+                lineHeight: 0.75,
                 paddingTop: '0.01em',
                 WebkitMaskImage:
                   'linear-gradient(to bottom, #000 18%, rgba(0,0,0,0.18) 62%, rgba(0,0,0,0.03) 84%, transparent 100%)',
@@ -330,7 +570,7 @@ function Hero() {
                   ref={(element) => {
                     portfolioWordRefs.current[index] = element
                   }}
-                  className="inline-block"
+                  className="block lg:inline-block"
                 >
                   {group}
                 </motion.span>
@@ -357,11 +597,11 @@ function Hero() {
 
           <div
             ref={firstSceneMetaRef}
-            className="absolute bottom-24 right-48 z-30 flex flex-col items-end gap-10 opacity-90"
+            className="absolute top-24 left-4 lg:top-auto lg:bottom-24 lg:left-auto lg:right-48 z-30 flex lg:flex flex-col items-start lg:items-end gap-6 lg:gap-10 opacity-90 hidden sm:flex"
           >
-            <div className="grid grid-cols-2 gap-x-16 gap-y-12 max-w-[550px]">
+            <div className="grid grid-cols-2 gap-x-8 lg:gap-x-16 gap-y-6 lg:gap-y-12 max-w-[320px] lg:max-w-[550px] text-left lg:text-right">
               {/* Left Column */}
-              <div className="flex flex-col justify-between gap-2 text-right">
+              <div className="flex flex-col justify-between gap-2">
                 <p className="text-sm font-extrabold uppercase leading-[1.5] tracking-wide text-[#333]">
                   Web and Mobile / UX<br />And UI / Branding
                 </p>
@@ -371,7 +611,7 @@ function Hero() {
               </div>
 
               {/* Right Column */}
-              <div className="flex flex-col justify-between gap-2 text-right">
+              <div className="flex flex-col justify-between gap-2">
                 <p className="text-sm font-extrabold uppercase leading-[1.5] tracking-wide text-[#333]">
                   Based in India
                 </p>
@@ -391,23 +631,23 @@ function Hero() {
           </div>
 
           {/* Testimonial/info block below meta grid */}
-          <div className="absolute bottom-56 left-48 z-30 flex items-center gap-3">
+          <div className="absolute bottom-5 left-4 lg:bottom-56 lg:left-48 z-30 flex items-center gap-3">
             {/* Avatars */}
             <div className="flex -space-x-3">
-              <img src="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=facearea&w=128&q=80" alt="Client 1" className="h-10 w-10 rounded-full border-2 border-white object-cover shadow-md bg-gray-200 z-20" />
-              <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=facearea&w=128&q=80" alt="Client 3" className="h-10 w-10 rounded-full border-2 border-white object-cover shadow-md bg-gray-200 z-10" />
-              <img src="https://images.unsplash.com/photo-1511367461989-f85a21fda167?auto=format&fit=facearea&w=128&q=80" alt="Client 2" className="h-10 w-10 rounded-full border-2 border-white object-cover shadow-md bg-gray-200 z-0" />
+              <img src="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=facearea&w=128&q=80" alt="Client 1" className="h-8 w-8 lg:h-10 lg:w-10 rounded-full border-2 border-white object-cover shadow-md bg-gray-200 z-20" />
+              <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=facearea&w=128&q=80" alt="Client 3" className="h-8 w-8 lg:h-10 lg:w-10 rounded-full border-2 border-white object-cover shadow-md bg-gray-200 z-10" />
+              <img src="https://images.unsplash.com/photo-1511367461989-f85a21fda167?auto=format&fit=facearea&w=128&q=80" alt="Client 2" className="h-8 w-8 lg:h-10 lg:w-10 rounded-full border-2 border-white object-cover shadow-md bg-gray-200 z-0" />
             </div>
             {/* Text */}
-            <div className="ml-2 text-xs max-w-48 font-normal text-[#444]">
-              Trusted by over <span className="font-bold text-black">many happy clients</span> <span className="font-normal">across residential and commercial projects.</span>
+            <div className="ml-2 text-[10px] lg:text-xs max-w-40 lg:max-w-48 font-normal text-[#444]">
+              Trusted by over <span className="font-bold text-black">many happy clients</span> <span className="font-normal hidden lg:inline">across residential and commercial projects.</span>
             </div>
           </div>
         </div>
         <div className="relative flex h-full w-full max-w-[1280px] flex-col gap-3 lg:flex-row">
           <div
-            className={`hero-profile-wrapper relative z-10 flex min-h-[520px] flex-col overflow-hidden ${transitionClass} ${isSocialVisible ? 'rounded-none bg-transparent' : 'rounded-none bg-transparent'
-              } ${isBentoVisible ? 'lg:flex-[0_0_33.333%]' : 'lg:flex-[0_0_100%]'
+            className={`hero-profile-wrapper relative z-10 flex lg:min-h-[520px] flex-col overflow-hidden ${transitionClass}
+              ${isBentoVisible ? 'flex-none lg:flex-[0_0_33.333%] lg:h-auto lg:min-h-[520px]' : 'flex-1 lg:flex-[0_0_100%]'
               }`}
           >
             <div
@@ -419,12 +659,12 @@ function Hero() {
               <img
                 src={amanBg}
                 alt="Portrait"
-                className={`pointer-events-none absolute bottom-0 left-1/2 z-20 h-full w-auto -translate-x-1/2 origin-bottom object-cover ${isImageExpanded ? 'scale-[0.92]' : 'scale-[0.75]'
+                className={`pointer-events-none absolute bottom-0 left-1/2 z-20 h-[55vh] w-auto max-w-none lg:h-full lg:max-h-none lg:w-auto -translate-x-1/2 origin-bottom object-cover ${isImageExpanded ? 'scale-100 lg:scale-[0.92]' : 'scale-[0.85] lg:scale-[0.75]'
                   }`}
               />
 
               <div
-                className="pointer-events-none absolute inset-0 z-0 overflow-hidden transition-opacity duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)]"
+                className="pointer-events-none absolute inset-0 z-0 overflow-hidden transition-opacity duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] flex items-end justify-center"
                 style={{ opacity: videoOpacity }}
               >
                 <video
@@ -438,7 +678,7 @@ function Hero() {
                     smoothedVideoTimeRef.current = 0
                     targetVideoTimeRef.current = 0
                   }}
-                  className="h-screen opacity-80 w-full object-cover"
+                  className="max-h-[85vh] lg:h-screen opacity-80 w-full object-cover origin-bottom"
                   style={{ transform: 'rotateY(180deg)' }}
                 />
               </div>
@@ -449,21 +689,21 @@ function Hero() {
               className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center text-center"
               style={{ opacity: textOpacity }}
             >
-              <div className="absolute left-0 bottom-16 max-w-[360px] text-left text-white">
-                <p className="text-sm uppercase tracking-[0.24em] text-white/70">Now Creating</p>
-                <p className="mt-3 text-lg leading-relaxed text-white/90">
+              <div className="absolute left-4 lg:left-0 bottom-16 lg:bottom-16 max-w-[280px] lg:max-w-[360px] text-left text-white">
+                <p className="text-xs lg:text-sm uppercase tracking-[0.24em] text-white/70">Now Creating</p>
+                <p className="mt-2 lg:mt-3 text-base lg:text-lg leading-relaxed text-white/90">
                   Ideas into campaigns, interfaces, and motion stories that feel handcrafted and unforgettable.
                 </p>
               </div>
-              <div className="absolute top-16 left-0 max-w-screen text-left text-white">
-                <h1 className="text-5xl font-regular leading-14 tracking-tighter sm:text-8xl">Built</h1>
-                <p className="pl-16 text-2xl font-serif font-extralight italic tracking-tighter text-white/95 sm:text-8xl">from instint,</p>
+              <div className="absolute top-8 left-4 lg:top-16 lg:left-0 max-w-screen text-left text-white max-w-[280px] lg:max-w-none">
+                <h1 className="text-4xl lg:text-5xl font-regular leading-8 lg:leading-14 tracking-tighter sm:text-8xl">Built</h1>
+                <p className="pl-4 lg:pl-16 text-xl lg:text-2xl font-serif font-extralight italic tracking-tighter text-white/95 sm:text-8xl">from instinct,</p>
               </div>
-              <div className="absolute bottom-16 right-0 max-w-fit text-right text-white">
-                <p className="text-2xl leading-0 font-medium text-white/95 sm:text-4xl">refined by</p>
-                <h1 className="text-5xl font-regular italic font-serif tracking-tight sm:text-9xl">
+              <div className="absolute bottom-40 right-4 lg:bottom-16 lg:right-0 max-w-fit text-right text-white">
+                <p className="text-xl lg:text-2xl leading-[1.2] font-medium text-white/95 sm:text-4xl mb-1 lg:mb-0">refined by</p>
+                <h1 className="text-4xl lg:text-5xl font-regular italic font-serif tracking-tight sm:text-9xl">
                   {['D', 'e', 's', 'i', 'g', 'n', '.'].map((char, index) => (
-                    <span 
+                    <span
                       key={index}
                       ref={(el) => designWordRefs.current[index] = el}
                       className="inline-block"
@@ -491,15 +731,16 @@ function Hero() {
             </motion.div>
           </div>
 
-          <div
-            className={`hero-content-grid relative z-10 grid min-h-[520px] gap-3 ${transitionClass} lg:grid-cols-3 lg:grid-rows-6 ${isBentoVisible
-                ? 'lg:flex-[0_0_66.666%] lg:translate-x-0 lg:scale-100 lg:opacity-100'
-                : 'lg:pointer-events-none lg:flex-[0_0_0%] lg:max-w-0 lg:translate-x-[-6%] lg:scale-95 lg:overflow-hidden lg:opacity-0'
-              }`}
-          >
-            <div className="group relative overflow-hidden rounded-xl bg-[#ece868] p-6 text-[#101010] lg:row-span-2 transition-transform duration-300 hover:scale-[1.02] hover:shadow-lg flex flex-col justify-between">
+          <div className={`relative z-20 lg:flex-[0_0_66.666%] ${isBentoVisible ? 'opacity-100' : 'opacity-0 max-h-0 lg:max-h-none pointer-events-none'} transition-all duration-1000`}>
+            <div
+              className={`hero-content-grid flex flex-col gap-4 lg:grid lg:gap-4 lg:grid-cols-3 lg:grid-rows-6 px-2 lg:px-0 pb-8 lg:pb-0 ${transitionClass} ${isBentoVisible
+                ? 'translate-y-0 h-max lg:h-full lg:translate-x-0'
+                : 'pointer-events-none translate-y-4 lg:translate-x-[-6%]'
+                }`}
+            >
+            <div className="group col-span-1 lg:col-span-1 relative overflow-hidden rounded-xl bg-[#ece868] p-3 lg:p-6 text-[#101010] row-span-2 lg:row-span-2 transition-transform duration-300 hover:scale-[1.02] hover:shadow-lg flex flex-col justify-between">
               <div className="max-w-[240px]">
-                <p className="font-clash-display text-2xl lg:text-[1.75rem] leading-[1.1] tracking-[-0.02em] font-medium">
+                <p className="font-clash-display text-[1rem] leading-tight lg:text-[1.75rem] lg:leading-[1.1] tracking-[-0.02em] font-medium">
                   Got an <span className='italic font-serif font-medium'>idea </span>? Don't let it rest.
                 </p>
                 <p className="mt-2 font-clash-grotesk text-base lg:text-lg text-black/80">
@@ -534,28 +775,23 @@ function Hero() {
               />
             </div>
 
-            <div className="group relative overflow-hidden flex gap-4 lg:gap-8 items-center rounded-xl bg-[#eaf2ff] p-7 text-[#12305f] lg:col-span-2 lg:row-span-2 transition-transform duration-300 hover:scale-[1.02] hover:shadow-lg">
+            <div className="group relative overflow-hidden flex flex-col sm:flex-row gap-4 lg:gap-8 items-start sm:items-center rounded-xl bg-[#eaf2ff] p-5 lg:p-7 text-[#12305f] lg:col-span-2 lg:row-span-2 transition-transform duration-300 hover:scale-[1.02] hover:shadow-lg">
               <p className="font-clash-grotesk flex-1 text-left text-lg lg:text-[1.35rem] leading-[1.4] text-[#143467]">
                 As an engineering student and digital designer, I specialize in crafting meaningful
                 UI/UX experiences, visual identities, and logo systems.
               </p>
               <img className='h-32 w-32 md:h-40 md:w-40 lg:h-48 lg:w-48 transition-transform duration-700 object-contain' src={astrick} alt="Astrick" />
             </div>
-
-            <div className="flex h-full min-h-0 flex-col gap-3 lg:row-span-2">
-              <div
-                className="relative flex-1 overflow-hidden rounded-xl bg-[#72e6cc] px-4"
-                onMouseEnter={() => setIsToolsHovered(true)}
-                onMouseLeave={() => setIsToolsHovered(false)}
-              >
+            <div className="flex h-full min-h-0 flex-col gap-2 lg:gap-3 row-span-1 lg:row-span-2 col-span-1 lg:col-span-1">
+              <div className="relative flex-1 overflow-hidden rounded-xl bg-[#72e6cc] px-4 flex items-center min-h-[100px] lg:min-h-[120px]">
                 <motion.div
-                  className="flex h-full w-max items-center gap-3 whitespace-nowrap pr-6"
-                  animate={isToolsHovered ? { x: ['0%', '-50%'] } : { x: '0%' }}
-                  transition={isToolsHovered ? { duration: 10, ease: 'linear', repeat: Infinity } : { duration: 0.25 }}
+                  className="flex items-center gap-10 whitespace-nowrap"
+                  animate={{ x: ['0%', '-50%'] }}
+                  transition={{ duration: 20, ease: 'linear', repeat: Infinity }}
                 >
-                  {[...toolIcons, ...toolIcons].map((icon, index) => (
-                    <div key={`tool-${icon.alt}-${index}`}>
-                      <img src={icon.src} alt={icon.alt} className="h-14 w-14 rounded-2xl object-contain" />
+                  {[...toolIcons, ...toolIcons, ...toolIcons].map((icon, index) => (
+                    <div key={`tool-desktop-${icon.alt}-${index}`}>
+                      <img src={icon.src} alt={icon.alt} className="h-14 w-14 lg:h-18 lg:w-18 rounded-2xl object-contain drop-shadow-md" />
                     </div>
                   ))}
                 </motion.div>
@@ -578,30 +814,30 @@ function Hero() {
               </div>
             </div>
 
-            <div className="flex items-center justify-center rounded-xl bg-[#eaf2ff] p-4 text-[#101828] lg:row-span-2 transition-colors hover:bg-white hover:shadow-lg">
-              <div className="grid h-full w-full max-h-[290px] max-w-[480px] grid-cols-2 grid-rows-2 gap-x-6 gap-y-6 px-4 py-4">
+            <div className="flex items-center justify-center rounded-xl bg-[#eaf2ff] p-2 lg:p-4 text-[#101828] col-span-2 lg:col-span-1 row-span-1 lg:row-span-2 transition-colors hover:bg-white hover:shadow-lg">
+              <div className="flex justify-between md:grid h-full w-full max-w-[480px] md:grid-cols-2 md:grid-rows-2 gap-[4px] lg:gap-x-6 lg:gap-y-6 px-1 lg:px-4 py-1 lg:py-4">
                 <div className="group flex h-full w-full flex-col items-start justify-center text-left transition-transform duration-300 hover:scale-105 hover:translate-x-1">
-                  <p className="font-clash-display text-3xl font-semibold tracking-tight">1+</p>
-                  <p className="mt-1 text-xs md:text-sm font-medium leading-[1.1] text-[#5c6375]">Years experience</p>
+                  <p className="font-clash-display text-xl lg:text-3xl font-semibold tracking-tight">1+</p>
+                  <p className="mt-1 text-[9px] md:text-sm font-medium leading-[1.1] text-[#5c6375]">Years<span className="hidden sm:inline"> experience</span></p>
                 </div>
                 <div className="group flex h-full w-full flex-col items-start justify-center text-left transition-transform duration-300 hover:scale-105 hover:translate-x-1">
-                  <p className="font-clash-display text-3xl font-semibold tracking-tight">3+</p>
-                  <p className="mt-1 text-xs md:text-sm font-medium leading-[1.1] text-[#5c6375]">Projects completed</p>
+                  <p className="font-clash-display text-xl lg:text-3xl font-semibold tracking-tight">3+</p>
+                  <p className="mt-1 text-[9px] md:text-sm font-medium leading-[1.1] text-[#5c6375]">Projects<span className="hidden sm:inline"> completed</span></p>
                 </div>
-                <div className="group flex h-full w-full flex-col items-start justify-center text-left transition-transform duration-300 hover:scale-105 hover:translate-x-1">
-                  <p className="font-clash-display text-3xl font-semibold tracking-tight">3+</p>
-                  <p className="mt-1 text-xs md:text-sm font-medium leading-[1.1] text-[#5c6375]">Happy clients</p>
+                <div className="group flex h-full w-full flex-col items-start justify-center text-left transition-transform duration-300 hover:scale-105 hover:translate-x-1 md:flex">
+                  <p className="font-clash-display text-xl lg:text-3xl font-semibold tracking-tight">3+</p>
+                  <p className="mt-1 text-[9px] md:text-sm font-medium leading-[1.1] text-[#5c6375]">Happy clients</p>
                 </div>
-                <div className="group flex h-full w-full flex-col items-start justify-center text-left transition-transform duration-300 hover:scale-105 hover:translate-x-1">
-                  <p className="font-clash-display text-3xl font-semibold tracking-tight">98%</p>
-                  <p className="mt-1 text-xs md:text-sm font-medium leading-[1.1] text-[#5c6375]">On-time delivery</p>
+                <div className="group flex h-full w-full flex-col items-start justify-center text-left transition-transform duration-300 hover:scale-105 hover:translate-x-1 md:flex">
+                  <p className="font-clash-display text-xl lg:text-3xl font-semibold tracking-tight">98%</p>
+                  <p className="mt-1 text-[9px] md:text-sm font-medium leading-[1.1] text-[#5c6375]">On-time delivery</p>
                 </div>
               </div>
             </div>
 
-            <div className="relative flex h-full flex-col justify-between overflow-hidden rounded-xl bg-[#eaf2ff] p-4 text-[#12305f] lg:col-start-3 lg:row-span-4 lg:row-start-3">
-              <div className="flex items-center justify-between px-4 py-3">
-                <p className="mt-1 text-3xl font-light leading-tight tracking-wider font-serif italic text-[#143467]">What <br /> I Offer</p>
+            <div className="relative flex h-full min-h-[160px] lg:min-h-0 flex-col justify-between overflow-hidden rounded-xl bg-[#eaf2ff] p-4 text-[#12305f] lg:col-span-1 lg:col-start-3 lg:row-span-4 lg:row-start-3">
+              <div className="flex items-center justify-between px-2 lg:px-4 py-2 lg:py-3">
+                <p className="mt-1 text-xl lg:text-3xl font-light leading-tight tracking-wider font-serif italic text-[#143467]">What <br /> I Offer</p>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="58"
@@ -642,7 +878,7 @@ function Hero() {
               </div>
             </div>
 
-            <a href="#work" className="group relative overflow-hidden rounded-xl lg:col-span-2 lg:row-span-2 cursor-pointer transition-shadow duration-300 hover:shadow-xl block">
+            <a href="#work" className="group relative overflow-hidden rounded-xl col-span-1 lg:col-span-2 row-span-2 lg:row-span-2 cursor-pointer transition-shadow duration-300 hover:shadow-xl block min-h-[220px] lg:min-h-[80px]">
               <div
                 className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-700 ease-out group-hover:scale-110"
                 style={{ backgroundImage: `url(${taglineMockup})` }}
@@ -661,31 +897,24 @@ function Hero() {
             </a>
           </div>
         </div>
+      </div>
 
         <div
-          className="absolute inset-x-0 bottom-0 z-40 w-full bg-black px-[30px] py-[10px] text-white transition-transform duration-300 ease-out"
+          className="absolute inset-x-0 bottom-0 z-40 w-full bg-black px-4 sm:px-[30px] pt-1 pb-2 sm:py-[10px] text-white transition-transform duration-300 ease-out"
           style={{
             transform: `translateY(${bottomBarTranslateY}%)`,
             opacity: bottomBarOpacity,
           }}
         >
-          <div className="flex items-center justify-between py-[10px] relative">
-            <p className="text-sm font-semibold uppercase tracking-[0.12em] leading-[0.1] sm:text-base w-1/3">
-              <span className='font-gochi-hand text-2xl'>ASK</span> <br /> <span className='pl-2 text-lg leading-0.5 tracking-tighter'>CREATIONS</span>
+          <div className="flex items-center justify-between py-1 sm:py-[10px] relative">
+            <p className="text-sm font-semibold uppercase tracking-[0.12em] leading-[0.1] sm:text-base flex-1">
+              <span className='font-gochi-hand text-2xl'>ASK</span> <br /> <span className='pl-1 text-sm sm:text-lg leading-0.5 tracking-tighter'>CREATIONS</span>
             </p>
-            
-            {/* Scroll Indicator */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center gap-2 pointer-events-none mt-1">
-              <span className="hidden sm:block text-[10px] font-semibold uppercase tracking-[0.2em] text-white/50">Scroll to Explore</span>
-              <svg className="w-4 h-4 sm:w-5 sm:h-5 animate-bounce text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-              </svg>
-            </div>
 
-            <div className="w-1/3 flex justify-end">
+            <div className="flex-1 flex justify-end">
               <Link
                 to="/contact"
-                className="pointer-events-auto bg-white px-8 py-2.5 sm:px-10 sm:py-3 text-sm font-semibold text-black transition-colors hover:bg-zinc-200"
+                className="pointer-events-auto bg-white px-5 py-2.5 sm:px-10 sm:py-3 text-[11px] sm:text-sm font-semibold text-black transition-colors hover:bg-zinc-200 whitespace-nowrap block text-center"
               >
                 Get in Touch
               </Link>
