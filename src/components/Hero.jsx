@@ -680,7 +680,7 @@ function Hero() {
             </div>
           </div>
         </div>
-        <div className="relative flex h-full w-full max-w-[1280px] flex-col gap-3 lg:flex-row">
+        <div className="relative flex h-full w-full max-w-[1280px] xl:max-w-[1440px] 2xl:max-w-[1640px] flex-col gap-3 lg:flex-row">
           <div
             className={`hero-profile-wrapper relative z-10 flex lg:min-h-[520px] flex-col overflow-hidden ${transitionClass}
               ${isBentoVisible ? 'flex-none lg:flex-[0_0_33.333%] lg:h-auto lg:min-h-[520px]' : 'flex-1 lg:flex-[0_0_100%]'
