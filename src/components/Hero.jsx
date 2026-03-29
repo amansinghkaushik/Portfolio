@@ -260,8 +260,10 @@ function Hero() {
       const target = targetVideoTimeRef.current
       smoothedVideoTimeRef.current += (target - smoothedVideoTimeRef.current) * 0.15
 
-      if (Math.abs(video.currentTime - smoothedVideoTimeRef.current) > 0.005) {
-        video.currentTime = smoothedVideoTimeRef.current
+      if (video.readyState >= 2) {
+        if (Math.abs(video.currentTime - smoothedVideoTimeRef.current) > 0.005) {
+          video.currentTime = smoothedVideoTimeRef.current
+        }
       }
 
       rafId = window.requestAnimationFrame(animateScrub)
@@ -390,6 +392,9 @@ function Hero() {
                     src={heroVideo}
                     muted
                     playsInline
+                    disablePictureInPicture
+                    disableRemotePlayback
+                    webkit-playsinline="true"
                     preload="auto"
                     onLoadedMetadata={(event) => {
                       setVideoDuration(event.currentTarget.duration || 0)
@@ -397,7 +402,7 @@ function Hero() {
                       targetVideoTimeRef.current = 0
                     }}
                     className="h-full opacity-80 w-full object-cover origin-bottom"
-                    style={{ transform: 'rotateY(180deg)' }}
+                    style={{ transform: 'rotateY(180deg) translateZ(0)', willChange: 'transform' }}
                   />
                 </div>
               </div>
@@ -584,7 +589,7 @@ function Hero() {
               </div>
             </div>
             <motion.div
-              className="font-condenso select-none text-[110vw] sm:text-[90vw] md:text-[200px] lg:text-[400px] xl:text-[550px] uppercase tracking-[0.02em] text-transparent opacity-70 flex flex-col lg:flex-row items-center justify-center lg:items-start text-center max-w-[100vw]"
+              className="font-condenso select-none text-[110vw] sm:text-[90vw] md:text-[200px] lg:text-[400px] xl:text-[600px] 2xl:text-[750px] uppercase tracking-[0.02em] text-transparent opacity-70 flex flex-col lg:flex-row items-center justify-center lg:items-start text-center max-w-[100vw]"
               style={{
                 WebkitTextStroke: '2px #23242a', // lighter outline
                 lineHeight: 0.75,
@@ -703,6 +708,9 @@ function Hero() {
                   src={heroVideo}
                   muted
                   playsInline
+                  disablePictureInPicture
+                  disableRemotePlayback
+                  webkit-playsinline="true"
                   preload="auto"
                   onLoadedMetadata={(event) => {
                     setVideoDuration(event.currentTarget.duration || 0)
@@ -710,7 +718,7 @@ function Hero() {
                     targetVideoTimeRef.current = 0
                   }}
                   className="max-h-screen lg:h-screen opacity-80 w-full object-cover origin-bottom"
-                  style={{ transform: 'rotateY(180deg)' }}
+                  style={{ transform: 'rotateY(180deg) translateZ(0)', willChange: 'transform' }}
                 />
               </div>
             </div>

@@ -26,7 +26,7 @@ function FooterSection() {
   return (
     <footer 
       ref={footerRef}
-      className="fixed bottom-0 left-0 w-full z-0 bg-[#0a0a0a] px-6 md:px-12 pt-16 pb-8 text-[#f5f5f7] flex flex-col justify-between min-h-[60vh] md:min-h-[75vh] font-clash-grotesk"
+      className="fixed bottom-0 left-0 w-full z-0 bg-[#0a0a0a] px-6 md:px-12 pt-16 pb-8 text-[#f5f5f7] flex flex-col justify-between h-[100dvh] min-h-[100dvh] font-clash-grotesk"
     >
       {/* Top Section */}
       <div className="w-full flex flex-col md:flex-row justify-between items-start gap-16">
