@@ -54,10 +54,12 @@ function WorkSection() {
     {
       title: 'Web Development',
       image: taglineMockup,
+      link: "https://tag-in-manufacture.vercel.app"
     },
     {
       title: 'Sundarban',
       image: sundarban,
+      link: 'https://sundarban-portfolio.vercel.app'
     },
     {
       title: 'Product Storytelling',
@@ -97,14 +99,16 @@ function WorkSection() {
                     <p className="font-clash-display text-3xl font-medium tracking-tight text-white mb-2 sm:mb-0 sm:text-4xl">
                       {card.title}
                     </p>
-                    <Link to="/case-study" className="pointer-events-auto flex items-center gap-4 group/btn">
-                      <span className="flex w-fit shrink-0 items-center justify-center rounded-full bg-white/10 backdrop-blur-md border border-white/20 px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-white hover:text-black">
+                    <div className="pointer-events-auto flex items-center gap-2">
+                      <Link to="/case-study" className="flex w-fit shrink-0 items-center justify-center rounded-full bg-white/10 backdrop-blur-md border border-white/20 px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-white hover:text-black">
                         Read More
-                      </span>
-                      <svg className="w-7 h-7 text-white transition-transform duration-300 group-hover/btn:-translate-y-1 group-hover/btn:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 7L7 17M17 7H8M17 7v9" />
-                      </svg>
-                    </Link>
+                      </Link>
+                      <a href={card.link} target="_blank" rel="noopener noreferrer" className="group/arrow flex items-center justify-center">
+                        <svg className="w-7 h-7 text-white transition-transform duration-300 group-hover/arrow:-translate-y-1 group-hover/arrow:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 7L7 17M17 7H8M17 7v9" />
+                        </svg>
+                      </a>
+                    </div>
                   </div>
                 </article>
               ))}
