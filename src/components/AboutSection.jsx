@@ -80,7 +80,7 @@ function AboutSection() {
           <img
             src={me}
             alt="Creative professional"
-            className="about-animate-block w-full max-w-[600px] h-auto lg:h-[600px] object-cover rounded-xl"
+            className="about-animate-block w-full max-w-[600px] h-[350px] md:h-[500px] lg:h-[600px] object-cover rounded-xl"
           />
           <div className="about-animate-block space-y-4">
             <p className="ds-eyebrow">Hybrid Artist + Designer</p>

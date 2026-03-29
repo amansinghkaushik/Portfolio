@@ -55,7 +55,7 @@ function CursorFollower() {
   return createPortal(
     <div
       ref={cursorRef}
-      className="pointer-events-none fixed z-9999 mix-blend-difference will-change-transform"
+      className="pointer-events-none fixed z-9999 mix-blend-difference will-change-transform hidden md:block"
       style={{ 
         top: 0, 
         left: 0,

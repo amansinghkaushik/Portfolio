@@ -37,6 +37,7 @@ function Hero() {
   const targetVideoTimeRef = useRef(0)
   const smoothedVideoTimeRef = useRef(0)
   const transitionTextRef = useRef(null)
+  const bentoRef = useRef(null)
   const [progress, setProgress] = useState(0)
   const [isReady, setIsReady] = useState(false)
   const [videoDuration, setVideoDuration] = useState(0)
@@ -257,9 +258,9 @@ function Hero() {
       if (!video) return
 
       const target = targetVideoTimeRef.current
-      smoothedVideoTimeRef.current += (target - smoothedVideoTimeRef.current) * 0.03
+      smoothedVideoTimeRef.current += (target - smoothedVideoTimeRef.current) * 0.15
 
-      if (Math.abs(video.currentTime - smoothedVideoTimeRef.current) > 0.016) {
+      if (Math.abs(video.currentTime - smoothedVideoTimeRef.current) > 0.005) {
         video.currentTime = smoothedVideoTimeRef.current
       }
 
@@ -292,6 +293,33 @@ function Hero() {
     }
   }, [])
 
+  useEffect(() => {
+    if (!isMobile || !bentoRef.current) return
+
+    const ctx = gsap.context(() => {
+      const cards = bentoRef.current.querySelectorAll('.bento-animate')
+      cards.forEach((el, i) => {
+        gsap.set(el, { opacity: 0, y: 30 })
+        ScrollTrigger.create({
+          trigger: el,
+          start: 'top 90%',
+          once: true,
+          onEnter: () => {
+            gsap.to(el, {
+              opacity: 1,
+              y: 0,
+              duration: 0.7,
+              delay: 0.08 * i,
+              ease: 'power2.out',
+            })
+          },
+        })
+      })
+    }, bentoRef)
+
+    return () => ctx.revert()
+  }, [isMobile])
+
   // ── Mobile: Animated scenes then static bento below ──────────────────────
   if (isMobile) {
     return (
@@ -300,11 +328,11 @@ function Hero() {
         <section
           id="hero"
           ref={sectionRef}
-          className="relative z-10 h-[350vh] w-full"
+          className="relative z-0 h-[500vh] w-full"
           style={{ backgroundColor: '#ececec' }}
         >
           <div
-            className={`sticky top-[56px] flex flex-col h-[calc(100dvh-56px)] w-full overflow-hidden bg-[#ececec] ${transitionClass} ${isSocialVisible ? 'px-4 py-4' : 'px-0 py-0'}`}
+            className={`sticky top-[56px] flex flex-col h-[calc(100vh-56px)] w-full overflow-hidden bg-[#ececec] ${transitionClass} ${isSocialVisible ? 'px-4 py-4' : 'px-0 py-0'}`}
           >
             {/* Black circle */}
             <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
@@ -319,20 +347,20 @@ function Hero() {
 
             {/* PORTFOLIO background text */}
             <div className="pointer-events-none absolute inset-0 z-0 w-full h-full">
-              <div className="absolute left-1/2 top-[60%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center w-full px-4">
-                <div className="absolute -top-16 select-none w-full">
+              <div className="absolute left-1/2 top-[50%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center w-full px-4">
+                <div className="absolute -top-8 -left-14 select-none w-full">
                   <div ref={welcomeRef} className="font-gochi-hand text-4xl uppercase tracking-[0.02em] text-[#1d4ed8] opacity-80 text-center">
                     Welcome to my
                   </div>
                 </div>
                 <motion.div
-                  className="font-condenso select-none text-[400px] uppercase tracking-[0.02em] text-transparent opacity-70 flex flex-col items-center text-center max-w-[100vw]"
+                  className="font-condenso select-none text-[350px] uppercase tracking-[0.02em] text-transparent opacity-70 flex flex-col items-center text-center max-w-[100vw]"
                   style={{
-                    WebkitTextStroke: '1px #23242a',
+                    WebkitTextStroke: '2px #23242a',
                     lineHeight: 0.75,
-                    paddingTop: '0.01em',
-                    WebkitMaskImage: 'linear-gradient(to bottom, #000 18%, rgba(0,0,0,0.18) 62%, rgba(0,0,0,0.03) 84%, transparent 100%)',
-                    maskImage: 'linear-gradient(to bottom, #000 18%, rgba(0,0,0,0.18) 62%, rgba(0,0,0,0.03) 84%, transparent 100%)',
+                    paddingTop: '0.1em',
+                    WebkitMaskImage: 'linear-gradient(to bottom, #000 18%, rgba(0,0,0,0.18) 85%, rgba(0,0,0,0.03) 90%, transparent 100%)',
+                    maskImage: 'linear-gradient(to bottom, #000 18%, rgba(0,0,0,0.18) 85%, rgba(0,0,0,0.03) 90%, transparent 100%)',
                   }}
                 >
                   {portfolioWordGroups.map((group, index) => (
@@ -350,7 +378,7 @@ function Hero() {
                 <img
                   src={amanBg}
                   alt="Portrait"
-                  className={`pointer-events-none absolute bottom-0 left-1/2 z-20 h-[55vh] w-auto max-w-none -translate-x-1/2 origin-bottom object-cover ${isImageExpanded ? 'scale-100' : 'scale-[0.85]'}`}
+                  className={`pointer-events-none absolute bottom-0 left-1/2 z-20 h-[65vh] w-auto max-w-none -translate-x-1/2 origin-bottom object-cover ${isImageExpanded ? 'scale-100' : 'scale-[0.85]'}`}
                 />
                 {/* Video scrub */}
                 <div
@@ -368,7 +396,7 @@ function Hero() {
                       smoothedVideoTimeRef.current = 0
                       targetVideoTimeRef.current = 0
                     }}
-                    className="max-h-[85vh] opacity-80 w-full object-cover origin-bottom"
+                    className="h-full opacity-80 w-full object-cover origin-bottom"
                     style={{ transform: 'rotateY(180deg)' }}
                   />
                 </div>
@@ -384,12 +412,12 @@ function Hero() {
                   <p className="mt-2 text-base leading-relaxed text-white/90">Ideas into campaigns, interfaces, and motion stories that feel handcrafted and unforgettable.</p>
                 </div>
                 <div className="absolute top-8 left-4 text-left text-white max-w-[260px]">
-                  <h1 className="text-4xl font-regular leading-8 tracking-tighter">Built</h1>
-                  <p className="pl-4 text-xl font-serif font-extralight italic tracking-tighter text-white/95">from instinct,</p>
+                  <h1 className="text-6xl font-regular leading-8 tracking-tighter">Built</h1>
+                  <p className="pl-4 text-4xl font-serif font-extralight italic tracking-tighter text-white/95">from instinct,</p>
                 </div>
-                <div className="absolute bottom-40 right-4 max-w-fit text-right text-white">
-                  <p className="text-xl leading-[1.2] font-medium text-white/95 mb-1">refined by</p>
-                  <h1 className="text-4xl font-regular italic font-serif tracking-tight">
+                <div className="absolute top-40 right-4 max-w-fit text-right text-white">
+                  <p className="text-4xl leading-[1.2] font-medium text-white/95 mb-1">refined by</p>
+                  <h1 className="text-6xl font-regular italic font-serif tracking-tight">
                     {['D', 'e', 's', 'i', 'g', 'n', '.'].map((char, index) => (
                       <span key={index} ref={(el) => designWordRefs.current[index] = el} className="inline-block">{char}</span>
                     ))}
@@ -429,10 +457,10 @@ function Hero() {
         </section>
 
         {/* ── Static bento section, just scrolls normally ─────────────────── */}
-        <div className="relative z-[1] bg-black flex flex-col gap-4 md:grid md:grid-cols-3 md:grid-rows-6 md:gap-4 px-4 pt-4 pb-12">
+        <div ref={bentoRef} className="relative z-10 -mt-[100vh] md:-mt-0 bg-black flex flex-col gap-4 md:grid md:grid-cols-3 md:grid-rows-6 md:gap-4 px-4 pt-4 pb-12">
 
           {/* CTA – yellow */}
-          <div className="relative overflow-hidden rounded-xl bg-[#ece868] p-5 text-[#101010] flex flex-col justify-between min-h-[160px] md:col-span-1 md:row-span-2 transition-transform duration-300 hover:scale-[1.02] hover:shadow-lg">
+          <div className="bento-animate relative overflow-hidden rounded-xl bg-[#ece868] p-5 text-[#101010] flex flex-col justify-between min-h-[160px] md:col-span-1 md:row-span-2 transition-transform duration-300 hover:scale-[1.02] hover:shadow-lg">
             <div className="max-w-[240px]">
               <p className="font-clash-display text-[1.1rem] md:text-[1.75rem] md:leading-[1.1] leading-tight tracking-[-0.02em] font-medium">
                 Got an <span className="italic font-serif font-medium">idea</span>? Don't let it rest.
@@ -449,7 +477,7 @@ function Hero() {
           </div>
 
           {/* About – blue */}
-          <div className="rounded-xl bg-[#eaf2ff] p-5 md:p-7 text-[#12305f] flex flex-col md:flex-row gap-4 md:gap-8 md:items-center md:col-span-2 md:row-span-2 transition-transform duration-300 hover:scale-[1.02] hover:shadow-lg">
+          <div className="bento-animate rounded-xl bg-[#eaf2ff] p-5 md:p-7 text-[#12305f] flex flex-col md:flex-row gap-4 md:gap-8 md:items-center md:col-span-2 md:row-span-2 transition-transform duration-300 hover:scale-[1.02] hover:shadow-lg">
             <p className="font-clash-grotesk text-lg md:text-[1.35rem] flex-1 leading-[1.4] text-[#143467]">
               As an engineering student and digital designer, I specialize in crafting meaningful UI/UX experiences, visual identities, and logo systems.
             </p>
@@ -457,16 +485,16 @@ function Hero() {
           </div>
 
           {/* Tools + Social column */}
-          <div className="flex flex-col gap-4 md:gap-3 md:row-span-2 md:col-span-1">
+          <div className="bento-animate flex flex-col gap-4 md:gap-3 md:row-span-2 md:col-span-1">
             {/* Tools strip */}
             <div className="relative flex-1 overflow-hidden rounded-xl bg-[#72e6cc] px-4 py-4 md:py-0 flex items-center min-h-[80px] md:min-h-[120px]">
               <motion.div 
-                className="flex items-center gap-8 md:gap-10 whitespace-nowrap"
+                className="flex w-max flex-nowrap items-center gap-8 md:gap-10"
                 animate={{ x: ['0%', '-50%'] }}
                 transition={{ duration: 15, ease: 'linear', repeat: Infinity }}
               >
                 {[...toolIcons, ...toolIcons, ...toolIcons].map((icon, index) => (
-                  <div key={`tool-mobile-${icon.alt}-${index}`}>
+                  <div key={`tool-mobile-${icon.alt}-${index}`} className="shrink-0 flex items-center justify-center">
                     <img src={icon.src} alt={icon.alt} className="h-12 w-12 md:h-14 md:w-14 rounded-xl md:rounded-2xl object-contain drop-shadow-sm md:drop-shadow-md" />
                   </div>
                 ))}
@@ -484,7 +512,7 @@ function Hero() {
           </div>
 
           {/* Stats */}
-          <div className="rounded-xl bg-[#eaf2ff] py-6 px-6 md:p-4 md:col-span-1 md:row-span-2 transition-colors duration-300 hover:bg-white hover:shadow-lg flex items-center justify-center">
+          <div className="bento-animate rounded-xl bg-[#eaf2ff] py-6 px-6 md:p-4 md:col-span-1 md:row-span-2 transition-colors duration-300 hover:bg-white hover:shadow-lg flex items-center justify-center">
             <div className="grid grid-cols-2 gap-y-6 gap-x-4 md:grid-cols-2 md:grid-rows-2 md:gap-x-6 md:gap-y-6 h-full w-full max-w-[480px] md:px-4 md:py-4">
               {[['1+', 'Years experience'], ['3+', 'Projects completed'], ['3+', 'Happy clients'], ['98%', 'On-time delivery']].map(([num, label]) => (
                 <div key={label} className="group flex flex-col items-start justify-center text-left transition-transform duration-300 hover:scale-105 hover:translate-x-1">
@@ -496,7 +524,7 @@ function Hero() {
           </div>
 
           {/* What I Offer */}
-          <div className="rounded-xl bg-[#eaf2ff] p-5 text-[#12305f] md:col-span-1 md:col-start-3 md:row-span-4 md:row-start-3 flex flex-col justify-between">
+          <div className="bento-animate rounded-xl bg-[#eaf2ff] p-5 text-[#12305f] md:col-span-1 md:col-start-3 md:row-span-4 md:row-start-3 flex flex-col justify-between">
             <div className="flex items-center justify-between mb-4 md:px-4 md:py-3">
               <p className="text-xl md:text-3xl font-light leading-tight tracking-wider font-serif italic text-[#143467]">What <br className="hidden md:inline" />I Offer</p>
               <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 256 256" fill="none" className="md:h-[4.75rem] md:w-[4.75rem] shrink-0" aria-hidden="true">
@@ -514,7 +542,7 @@ function Hero() {
           </div>
 
           {/* Projects mockup */}
-          <a href="#work" className="group relative overflow-hidden rounded-xl block min-h-[220px] md:min-h-[80px] cursor-pointer md:col-span-2 md:row-span-2 transition-shadow duration-300 hover:shadow-xl">
+          <a href="#work" className="bento-animate group relative overflow-hidden rounded-xl block min-h-[220px] md:min-h-[80px] cursor-pointer md:col-span-2 md:row-span-2 transition-shadow duration-300 hover:shadow-xl">
             <div className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-700 ease-out group-hover:scale-110" style={{ backgroundImage: `url(${taglineMockup})` }} />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent transition-opacity duration-300 group-hover:from-black/80" />
             <div className="absolute bottom-5 right-6 flex items-center gap-3 md:gap-4 md:translate-y-4 md:opacity-0 md:transition-all md:duration-500 md:ease-out md:group-hover:translate-y-0 md:group-hover:opacity-100">
@@ -549,7 +577,7 @@ function Hero() {
         </div>
 
         <div className="pointer-events-none absolute inset-0 z-0 w-full h-full">
-          <div className="absolute left-1/2 top-[60%] lg:top-[55%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center lg:items-start w-full px-4 lg:w-auto lg:px-0">
+          <div className="absolute left-1/2 top-[45%] lg:top-[45%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center lg:items-start w-full px-4 lg:w-auto lg:px-0">
             <div className="absolute -top-16 lg:-top-8 select-none w-full">
               <div ref={welcomeRef} className="font-gochi-hand text-4xl sm:text-5xl lg:text-6xl uppercase tracking-[0.02em] text-[#1d4ed8] opacity-80 text-center lg:text-left">
                 Welcome to my
@@ -558,9 +586,9 @@ function Hero() {
             <motion.div
               className="font-condenso select-none text-[110vw] sm:text-[90vw] md:text-[200px] lg:text-[400px] xl:text-[550px] uppercase tracking-[0.02em] text-transparent opacity-70 flex flex-col lg:flex-row items-center justify-center lg:items-start text-center max-w-[100vw]"
               style={{
-                WebkitTextStroke: '1px #23242a', // lighter outline
+                WebkitTextStroke: '2px #23242a', // lighter outline
                 lineHeight: 0.75,
-                paddingTop: '0.01em',
+                paddingTop: '0.1em',
                 WebkitMaskImage:
                   'linear-gradient(to bottom, #000 18%, rgba(0,0,0,0.18) 62%, rgba(0,0,0,0.03) 84%, transparent 100%)',
                 maskImage:
@@ -681,7 +709,7 @@ function Hero() {
                     smoothedVideoTimeRef.current = 0
                     targetVideoTimeRef.current = 0
                   }}
-                  className="max-h-[85vh] lg:h-screen opacity-80 w-full object-cover origin-bottom"
+                  className="max-h-screen lg:h-screen opacity-80 w-full object-cover origin-bottom"
                   style={{ transform: 'rotateY(180deg)' }}
                 />
               </div>
@@ -699,12 +727,12 @@ function Hero() {
                 </p>
               </div>
               <div className="absolute top-8 left-4 lg:top-16 lg:left-0 max-w-screen text-left text-white max-w-[280px] lg:max-w-none">
-                <h1 className="text-4xl lg:text-5xl font-regular leading-8 lg:leading-14 tracking-tighter sm:text-8xl">Built</h1>
-                <p className="pl-4 lg:pl-16 text-xl lg:text-2xl font-serif font-extralight italic tracking-tighter text-white/95 sm:text-8xl">from instinct,</p>
+                <h1 className="text-4xl lg:text-8xl font-regular leading-8 lg:leading-14 tracking-tighter sm:text-8xl">Built</h1>
+                <p className="pl-4 lg:pl-16 text-xl lg:text-8xl font-serif font-extralight italic tracking-tighter text-white/95 sm:text-8xl">from instinct,</p>
               </div>
               <div className="absolute bottom-40 right-4 lg:bottom-16 lg:right-0 max-w-fit text-right text-white">
-                <p className="text-xl lg:text-2xl leading-[1.2] font-medium text-white/95 sm:text-4xl mb-1 lg:mb-0">refined by</p>
-                <h1 className="text-4xl lg:text-5xl font-regular italic font-serif tracking-tight sm:text-9xl">
+                <p className="text-xl lg:text-8xl leading-[1.2] font-medium text-white/95 sm:text-4xl mb-1 lg:mb-0">refined by</p>
+                <h1 className="text-4xl lg:text-8xl font-regular italic font-serif tracking-tight sm:text-9xl">
                   {['D', 'e', 's', 'i', 'g', 'n', '.'].map((char, index) => (
                     <span
                       key={index}
@@ -788,12 +816,12 @@ function Hero() {
             <div className="flex h-full min-h-0 flex-col gap-2 lg:gap-3 row-span-1 lg:row-span-2 col-span-1 lg:col-span-1">
               <div className="relative flex-1 overflow-hidden rounded-xl bg-[#72e6cc] px-4 flex items-center min-h-[100px] lg:min-h-[120px]">
                 <motion.div
-                  className="flex items-center gap-10 whitespace-nowrap"
+                  className="flex w-max flex-nowrap items-center gap-10"
                   animate={{ x: ['0%', '-50%'] }}
                   transition={{ duration: 20, ease: 'linear', repeat: Infinity }}
                 >
                   {[...toolIcons, ...toolIcons, ...toolIcons].map((icon, index) => (
-                    <div key={`tool-desktop-${icon.alt}-${index}`}>
+                    <div key={`tool-desktop-${icon.alt}-${index}`} className="shrink-0 flex items-center justify-center">
                       <img src={icon.src} alt={icon.alt} className="h-14 w-14 lg:h-18 lg:w-18 rounded-2xl object-contain drop-shadow-md" />
                     </div>
                   ))}

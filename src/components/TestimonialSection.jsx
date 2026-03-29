@@ -1,23 +1,11 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { Link } from 'react-router-dom'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const testimonials = [
-  {
-    quote: "Working with Elian was seamless from start to finish. He understood our goals quickly, asked the right questions, and delivered a design system that scaled perfectly with our growing modern bet app.",
-    name: "Daniel Reed",
-    role: "Founder of NovaLabs",
-    avatar: "https://i.pravatar.cc/150?img=11" // Placeholder avatar
-  },
-  {
-    quote: "Elian brought our product vision to life with incredible attention to detail. His ability to balance business needs with user empathy made our platform not just beautiful — but genuinely useful.",
-    name: "Sarah Nguyen",
-    role: "Product Manager at FlowSync",
-    avatar: "https://i.pravatar.cc/150?img=5" // Placeholder avatar
-  }
-]
+import { testimonialsData } from '../data/testimonials'
 
 function TestimonialSection() {
   const sectionRef = useRef(null)
@@ -49,12 +37,32 @@ function TestimonialSection() {
   return (
     <section ref={sectionRef} className="ds-section bg-white py-20 lg:py-32 relative overflow-hidden">
       <div className="ds-container">
+        
+        {/* Header with View All Button */}
+        <div className="test-animate flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-6">
+          <div>
+            <p className="ds-eyebrow mb-2">Testimonials</p>
+            <h2 className="text-4xl md:text-6xl font-clash-display font-semibold tracking-tight text-[#111]">
+              Client Love.
+            </h2>
+          </div>
+          <Link 
+            to="/testimonials" 
+            className="group flex flex-shrink-0 items-center gap-2 px-6 py-3 rounded-full border border-black text-sm font-semibold uppercase tracking-widest text-[#111] hover:bg-black hover:text-white transition-colors"
+          >
+            Show All
+            <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 7L7 17M17 7H8M17 7v9" />
+            </svg>
+          </Link>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 relative">
           
           {/* Subtle center divider for desktop */}
           <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-[1px] bg-black/5 -translate-x-1/2"></div>
           
-          {testimonials.map((test, index) => (
+          {testimonialsData.slice(0, 2).map((test, index) => (
             <div key={index} className="test-animate flex flex-col relative pr-8">
               
               {/* Quote Icon */}

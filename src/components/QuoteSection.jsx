@@ -11,12 +11,21 @@ function QuoteSection() {
   useEffect(() => {
     if (!textRef.current) return
 
-    // Split text into individual characters
+    // Split text into individual characters (desktop) or words (mobile)
     const text = textRef.current.textContent
-    textRef.current.innerHTML = text
-      .split('')
-      .map((char) => `<span class="inline-block opacity-100">${char === ' ' ? '&nbsp;' : char}</span>`)
-      .join('')
+    const isMobile = window.innerWidth < 768
+
+    if (isMobile) {
+      textRef.current.innerHTML = text
+        .split(' ')
+        .map((word) => `<span class="inline-block opacity-0">${word}</span> `)
+        .join('')
+    } else {
+      textRef.current.innerHTML = text
+        .split('')
+        .map((char) => `<span class="inline-block opacity-0">${char === ' ' ? '&nbsp;' : char}</span>`)
+        .join('')
+    }
 
     const spans = textRef.current.querySelectorAll('span')
 
@@ -31,7 +40,7 @@ function QuoteSection() {
       },
     })
 
-    // Animate each character with staggered offset
+    // Animate each span with staggered offset
     spans.forEach((span, index) => {
       tl.fromTo(
         span,
@@ -44,7 +53,7 @@ function QuoteSection() {
           opacity: 1,
           duration: 0.8,
         },
-        index * 0.05,
+        index * (isMobile ? 0.15 : 0.05),
       )
     })
 
@@ -61,7 +70,7 @@ function QuoteSection() {
       <div className="max-w-5xl px-8">
         <p
           ref={textRef}
-          className="text-center font-semibold text-6xl leading-relaxed tracking-tighter text-[#0d0d0d]"
+          className="text-center font-semibold text-3xl md:text-6xl leading-[1.2] md:leading-relaxed tracking-tighter text-[#0d0d0d]"
         >
           "Design is not just what it looks like. Design is how it works."
         </p>
