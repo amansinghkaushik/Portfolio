@@ -241,7 +241,7 @@ function Hero({ isPreloaderFinished = true }) {
       if (!element) return
       const wordProgress = getPortfolioWordProgress(index)
       gsap.set(element, {
-        y: -220 * wordProgress,
+        y: 400 * wordProgress,
         opacity: 1 - wordProgress,
       })
     })
@@ -375,30 +375,55 @@ function Hero({ isPreloaderFinished = true }) {
               />
             </div>
 
-            {/* PORTFOLIO background text */}
-            <div className="pointer-events-none absolute inset-0 z-0 w-full h-full">
-              <div className="absolute left-1/2 top-[50%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center w-full px-4">
-                <div className="absolute -top-8 -left-14 select-none w-full">
-                  <div ref={welcomeRef} className="font-gochi-hand text-4xl uppercase tracking-[0.02em] text-[#1d4ed8] opacity-80 text-center">
-                    Welcome to my
+            {/* PORTFOLIO background text & 3-Column Header */}
+            <div className={`pointer-events-none absolute inset-0 z-0 w-full h-full transition-opacity duration-1000 ease-out`}>
+              {/* Combined Wrapper for 3-Column Text & PORTFOLIO Text */}
+              <div className="relative w-full h-[100vh] pt-[120px] pb-[80px] flex flex-col justify-between items-center pointer-events-none z-10">
+                
+                {/* 3-Column Meta Info Wrapper */}
+                <div ref={firstSceneMetaRef} className="w-full flex flex-col sm:flex-row justify-between items-start z-20 opacity-80 px-6 sm:px-[8vw] gap-4 sm:gap-0">
+                  <div className="flex items-start gap-1 max-w-[100px] lg:max-w-[200px]">
+                    <span className="text-sm font-extrabold text-[#f12020] mt-[-1px]">›</span>
+                    <div className="flex flex-col gap-1 text-left">
+                      <p className="font-extrabold text-[#111] text-[9px] uppercase tracking-wider">WEB DESIGNER / UI/UX</p>
+                      <p className="text-gray-500 font-medium text-[8px] whitespace-nowrap lg:whitespace-normal">Crafting immersive functional digital experiences.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-1 max-w-[100px] lg:max-w-[200px] flex">
+                    <span className="text-sm font-extrabold text-[#f12020] mt-[-1px]">›</span>
+                    <div className="flex flex-col gap-1 text-left">
+                      <p className="font-extrabold text-[#111] text-[9px] uppercase tracking-wider">BASED IN INDIA</p>
+                      <p className="text-gray-500 font-medium text-[8px] whitespace-nowrap lg:whitespace-normal">Delivering scale and quality globally.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-1 max-w-[100px] lg:max-w-[200px] pointer-events-auto">
+                    <span className="text-sm font-extrabold text-[#f12020] mt-[-1px] pointer-events-none">›</span>
+                    <div className="flex flex-col gap-3 text-left">
+                      <div className="flex flex-col gap-1 pointer-events-none">
+                        <p className="font-extrabold text-[#111] text-[9px] uppercase tracking-wider">7+ HACKATHONS WON</p>
+                        <p className="text-gray-500 font-medium text-[8px] whitespace-nowrap lg:whitespace-normal">Winning solutions built in record time.</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <motion.div
-                  className="font-condenso select-none text-[350px] uppercase tracking-[0.02em] text-transparent opacity-70 flex flex-col items-center text-center max-w-[100vw]"
-                  style={{
-                    WebkitTextStroke: '2px #23242a',
-                    lineHeight: 0.75,
-                    paddingTop: '0.1em',
-                    WebkitMaskImage: 'linear-gradient(to bottom, #000 18%, rgba(0,0,0,0.18) 85%, rgba(0,0,0,0.03) 90%, transparent 100%)',
-                    maskImage: 'linear-gradient(to bottom, #000 18%, rgba(0,0,0,0.18) 85%, rgba(0,0,0,0.03) 90%, transparent 100%)',
-                  }}
-                >
-                  {portfolioWordGroups.map((group, index) => (
-                    <motion.span key={group} ref={(el) => { portfolioWordRefs.current[index] = el }} className="block">
-                      {group}
-                    </motion.span>
-                  ))}
-                </motion.div>
+
+                {/* Solid Filled PORTFOLIO Text */}
+                <div className="w-full flex flex-col items-center overflow-visible">
+                  <motion.div
+                    className="font-condenso select-none text-[400px] sm:text-[90vw] md:text-[600px] lg:text-[700px] xl:text-[700px] 2xl:text-[750px] uppercase tracking-[0.001em] text-neutral-300 flex flex-col justify-center items-center text-center w-full translate-y-[10%] sm:translate-y-[22%]"
+                    style={{
+                      lineHeight: 0.75,
+                      paddingTop: '0.01em',
+                      paddingBottom: '0.01em'
+                    }}
+                  >
+                    {portfolioWordGroups.map((group, index) => (
+                      <motion.span key={group} ref={(el) => { portfolioWordRefs.current[index] = el }} className="block">
+                        {group}
+                      </motion.span>
+                    ))}
+                  </motion.div>
+                </div>
               </div>
             </div>
 
@@ -610,36 +635,61 @@ function Hero({ isPreloaderFinished = true }) {
         </div>
 
         <div className={`pointer-events-none absolute inset-0 z-0 w-full h-full transition-opacity duration-1000 delay-[600ms] ease-out ${!isPreloaderFinished ? 'opacity-0' : 'opacity-100'}`}>
-          <div className="absolute left-1/2 top-[45%] lg:top-[45%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center lg:items-start w-full px-4 lg:w-auto lg:px-0">
-            <div className="absolute -top-16 lg:-top-8 select-none w-full">
-              <div ref={welcomeRef} className="font-gochi-hand text-4xl sm:text-5xl lg:text-6xl uppercase tracking-[0.02em] text-[#1d4ed8] opacity-80 text-center lg:text-left">
-                Welcome to my
+          {/* Combined Wrapper for 3-Column Text & PORTFOLIO Text */}
+          <div className="relative w-full h-[100vh] pt-[150px] xl:pt-[100px] pb-[80px] flex justify-center items-center pointer-events-none z-10 w-full">
+            <div className="h-full w-full flex flex-col justify-between items-center xl:w-fit px-6 lg:px-[6vw] xl:px-0">
+              {/* Top 3-Column Meta Info Wrapper */}
+              <div ref={firstSceneMetaRef} className="w-full flex flex-wrap xl:flex-nowrap justify-between opacity-80 z-20 gap-y-10">
+              <div className="flex items-start gap-2 max-w-[260px] pointer-events-auto">
+                <span className="text-2xl font-extrabold text-[#f12020] mt-[-2px] pointer-events-none">›</span>
+                <div className="flex flex-col gap-5 text-left">
+                  <div className="flex flex-col gap-1.5 pointer-events-none">
+                    <p className="font-extrabold text-[#111] text-lg lg:text-base uppercase tracking-wider">7+ HACKATHONS WINNER</p>
+                    <p className="text-gray-500 font-medium text-[10px] lg:text-xs">Proven track record of building innovative solutions in record time.</p>
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-start gap-2 max-w-[260px]">
+                <span className="text-2xl font-extrabold text-[#f12020] mt-[-2px]">›</span>
+                <div className="flex flex-col gap-1.5 text-left">
+                  <p className="font-extrabold text-[#111] text-lg lg:text-base uppercase tracking-wider">WEB DESIGNER / UI/UX</p>
+                  <p className="text-gray-500 font-medium text-[10px] lg:text-xs">Crafting immersive and functional digital aesthetics for modern brands.</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2 max-w-[260px]">
+                <span className="text-2xl font-extrabold text-[#f12020] mt-[-2px]">›</span>
+                <div className="flex flex-col gap-1.5 text-left">
+                  <p className="font-extrabold text-[#111] text-lg lg:text-base uppercase tracking-wider">BASED IN INDIA</p>
+                  <p className="text-gray-500 font-medium text-[10px] lg:text-xs">Delivering global scale products built with passion, precision, and artistry.</p>
+                </div>
               </div>
             </div>
-            <motion.div
-              className="font-condenso select-none text-[110vw] sm:text-[90vw] md:text-[200px] lg:text-[400px] xl:text-[600px] 2xl:text-[750px] uppercase tracking-[0.02em] text-transparent opacity-70 flex flex-col lg:flex-row items-center justify-center lg:items-start text-center max-w-[100vw]"
-              style={{
-                WebkitTextStroke: '3px #23242a', // lighter outline
-                lineHeight: 0.75,
-                paddingTop: '0.1em',
-                WebkitMaskImage:
-                  'linear-gradient(to bottom, #000 18%, rgba(0,0,0,0.18) 62%, rgba(0,0,0,0.03) 84%, transparent 100%)',
-                maskImage:
-                  'linear-gradient(to bottom, #000 18%, rgba(0,0,0,0.18) 62%, rgba(0,0,0,0.03) 84%, transparent 100%)',
-              }}
-            >
-              {portfolioWordGroups.map((group, index) => (
-                <motion.span
-                  key={group}
-                  ref={(element) => {
-                    portfolioWordRefs.current[index] = element
-                  }}
-                  className="block lg:inline-block"
-                >
-                  {group}
-                </motion.span>
+
+            {/* Solid Filled PORTFOLIO Text */}
+            <div className="w-fit flex flex-col items-center overflow-visible px-4 lg:px-0">
+              <motion.div
+                className="font-condenso select-none text-[110vw] sm:text-[90vw] md:text-[200px] lg:text-[750px] xl:text-[700px] 2xl:text-[750px] uppercase tracking-[0.001em] text-neutral-300 flex flex-col xl:block justify-center items-center text-center w-full translate-y-[15%] xl:translate-y-[20%]"
+                style={{
+                  lineHeight: 0.75,
+                  paddingTop: '0.01em',
+                  paddingBottom: '0.01em',
+                }}
+              >
+                {portfolioWordGroups.map((group, index) => (
+                  <motion.span
+                    key={group}
+                    ref={(element) => {
+                      portfolioWordRefs.current[index] = element
+                    }}
+                    className="block xl:inline-block"
+                  >
+                    {group}
+                  </motion.span>
               ))}
-            </motion.div>
+              </motion.div>
+            </div>
+          </div>
+
             {/* <div className="text-right flex-col w-full -mt-26 select-none">
               <div ref={basedRef} className="text-2xl uppercase tracking-[0.2em] absolute -right-20 px-6 font-medium text-[#000000] opacity-80 text-right">
                 Based in INDIA
@@ -659,31 +709,31 @@ function Hero({ isPreloaderFinished = true }) {
               </div> */}
           </div>
 
-          <div
+          {/* <div
             ref={firstSceneMetaRef}
             className="absolute top-24 left-4 lg:top-auto lg:bottom-36 lg:left-auto lg:right-48 z-30 flex lg:flex flex-col items-start lg:items-end gap-6 lg:gap-10 opacity-90 hidden sm:flex"
           >
-            <div className="grid grid-cols-2 gap-x-8 lg:gap-x-16 gap-y-6 lg:gap-y-12 max-w-[320px] lg:max-w-[550px] text-left lg:text-right">
+            <div className="grid grid-cols-2 gap-x-8 lg:gap-x-16 gap-y-6 lg:gap-y-12 max-w-[320px] lg:max-w-[550px] text-left lg:text-right"> */}
               {/* Left Column */}
-              <div className="flex flex-col justify-between gap-2">
+              {/* <div className="flex flex-col justify-between gap-2">
                 <p className="text-sm font-extrabold uppercase leading-[1.5] tracking-wide text-[#333]">
                   Web and Mobile / UX<br />And UI / Branding
                 </p>
                 <p className="text-sm font-regular uppercase leading-[1] tracking-wide text-[#444]">
                   Currently available<br />for freelance<br />worldwide
                 </p>
-              </div>
+              </div> */}
 
               {/* Right Column */}
-              <div className="flex flex-col justify-between gap-2">
+              {/* <div className="flex flex-col justify-between gap-2">
                 <p className="text-sm font-extrabold uppercase leading-[1.5] tracking-wide text-[#333]">
                   Based in India
                 </p>
                 <p className="text-sm font-regular uppercase leading-[1] tracking-wide text-[#444]">
                   Born in<br />Uttar Pradesh
                 </p>
-              </div>
-            </div>
+              </div> */}
+            {/* </div> */}
 
             {/* Achievement Capsule */}
             {/* <div className="flex items-center gap-2.5 rounded-full border border-black/10 bg-black/5 px-5 py-2 backdrop-blur-md">
@@ -692,7 +742,7 @@ function Hero({ isPreloaderFinished = true }) {
                 7+ times hackathon winner
               </p>
             </div> */}
-          </div>
+          {/* </div> */}
 
           {/* Testimonial/info block below meta grid */}
           {/* <div className="absolute bottom-5 left-4 lg:bottom-56 lg:left-48 z-30 flex items-center gap-3">
@@ -706,7 +756,7 @@ function Hero({ isPreloaderFinished = true }) {
             </div>
           </div> */}
         </div>
-        <div className="relative flex h-full w-full max-w-[1920px] max-h-[1080px] 3xl:aspect-video mx-auto flex-col gap-3 lg:flex-row">
+        <div className="relative flex h-full w-full max-w-[1920px] 2xl:max-h-[1080px] 3xl:aspect-video mx-auto flex-col gap-3 lg:flex-row">
           <div
             className={`hero-profile-wrapper relative z-10 flex lg:min-h-[520px] flex-col overflow-hidden ${transitionClass}
               ${isBentoVisible ? 'flex-none lg:flex-[0_0_33.333%] lg:h-auto lg:min-h-[520px]' : 'flex-1 lg:flex-[0_0_100%]'
@@ -965,18 +1015,17 @@ function Hero({ isPreloaderFinished = true }) {
         </div>
 
         <div
-          className={`absolute inset-x-0 bottom-0 z-40 w-full bg-black px-4 sm:px-[30px] pt-1 pb-2 sm:py-[10px] text-white transition-transform duration-1000 delay-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${!isPreloaderFinished ? 'translate-y-full' : ''}`}
-          style={{
-            transform: isPreloaderFinished ? `translateY(${bottomBarTranslateY}%)` : 'translateY(100%)',
-            opacity: isPreloaderFinished ? bottomBarOpacity : 0,
-          }}
+          className={`absolute inset-x-0 bottom-0 z-50 w-full bg-black px-4 sm:px-[30px] pt-1 pb-2 sm:py-[10px] text-white pointer-events-auto transition-all duration-1000 ease-[cubic-bezier(0.65,0,0.35,1)] ${
+            !isPreloaderFinished ? 'opacity-0 translate-y-full' 
+            : progress > 0.05 ? 'opacity-0 translate-y-full' 
+            : 'opacity-100 translate-y-0'
+          }`}
         >
           <div className="flex items-center justify-between py-1 sm:py-[10px] relative">
             <p className="text-sm font-semibold uppercase tracking-[0.12em] leading-[0.1] sm:text-base flex-1">
               <span className='font-gochi-hand text-2xl'>ASK</span> <br /> <span className='pl-1 text-sm sm:text-lg leading-0.5 tracking-tighter'>CREATIONS</span>
             </p>
 
-            {/* Scroll Indicator - Desktop Only */}
             <div className="hidden lg:flex flex-1 justify-center items-center pointer-events-none">
               <div className="flex flex-col items-center gap-1 opacity-50">
                 <div className="w-[1.5px] h-6 bg-white/20 relative overflow-hidden rounded-full">
