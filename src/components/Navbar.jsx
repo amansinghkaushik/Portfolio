@@ -3,7 +3,7 @@ import MenuButton from './MenuButton'
 import TextCycler from './TextCycler'
 import { Link, useLocation } from 'react-router-dom'
 
-function Navbar() {
+function Navbar({ isPreloaderFinished = true }) {
   const [isOpen, setIsOpen] = useState(false)
   const [dateTime, setDateTime] = useState('')
   const location = useLocation()
@@ -50,7 +50,7 @@ function Navbar() {
   }
 
   return (
-    <nav className="fixed top-0 left-0 right-0 border-b border-black/10 bg-black px-4 md:px-[30px] z-[100]">
+    <nav className={`fixed top-0 left-0 right-0 border-b border-black/10 bg-black px-4 md:px-[30px] z-[100] transition-transform duration-1000 delay-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${isPreloaderFinished ? 'translate-y-0' : '-translate-y-full'}`}>
       {/* Inner NavBar */}
       <div className="flex items-center justify-between py-[10px] text-white relative">
 

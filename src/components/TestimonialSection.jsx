@@ -48,7 +48,7 @@ function TestimonialSection() {
           </div>
           <Link 
             to="/testimonials" 
-            className="group flex flex-shrink-0 items-center gap-2 px-6 py-3 rounded-full border border-black text-sm font-semibold uppercase tracking-widest text-[#111] hover:bg-black hover:text-white transition-colors"
+            className="group flex flex-shrink-0 items-center gap-2 px-6 py-3 rounded-sm border border-black text-sm font-semibold uppercase tracking-widest text-[#111] hover:bg-black hover:text-white transition-colors"
           >
             Show All
             <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
