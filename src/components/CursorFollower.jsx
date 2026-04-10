@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import gsap from 'gsap'
 
-function CursorFollower() {
+function CursorFollower({ isVisible = true }) {
   const cursorRef = useRef(null)
 
   useEffect(() => {
@@ -55,7 +55,7 @@ function CursorFollower() {
   return createPortal(
     <div
       ref={cursorRef}
-      className="pointer-events-none fixed z-9999 mix-blend-difference will-change-transform hidden md:block"
+      className={`pointer-events-none fixed z-9999 mix-blend-difference will-change-transform hidden md:block transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
       style={{ 
         top: 0, 
         left: 0,

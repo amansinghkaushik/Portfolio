@@ -16,7 +16,7 @@ function App() {
   return (
     <div className="relative bg-black">
       {!isPreloaderFinished && <Preloader onComplete={() => setIsPreloaderFinished(true)} />}
-      <CursorFollower />
+      <CursorFollower isVisible={isPreloaderFinished} />
       <Navbar isPreloaderFinished={isPreloaderFinished} />
 
       <main 

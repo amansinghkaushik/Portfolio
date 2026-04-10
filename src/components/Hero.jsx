@@ -21,7 +21,9 @@ import pythonIcon from '../assets/python.svg'
 import instagramIcon from '../assets/instagram.svg'
 import linkedinIcon from '../assets/linkedin.svg'
 import whatsappIcon from '../assets/whatsapp.svg'
-import heroVideo from '../assets/Vdeo.mp4'
+
+const frameModules = import.meta.glob('../assets/Video-sequence/*.jpg', { eager: true, query: '?url', import: 'default' })
+const frames = Object.keys(frameModules).sort().map(key => frameModules[key])
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -33,14 +35,12 @@ function Hero({ isPreloaderFinished = true }) {
   const firstSceneMetaRef = useRef(null)
   const portfolioWordRefs = useRef([])
   const designWordRefs = useRef([])
-  const videoRef = useRef(null)
-  const targetVideoTimeRef = useRef(0)
-  const smoothedVideoTimeRef = useRef(0)
   const transitionTextRef = useRef(null)
   const bentoRef = useRef(null)
+  const sequenceCanvasRef = useRef(null)
+  const sequenceImagesRef = useRef([])
   const [progress, setProgress] = useState(0)
   const [isReady, setIsReady] = useState(false)
-  const [videoDuration, setVideoDuration] = useState(0)
   const [isToolsHovered, setIsToolsHovered] = useState(false)
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 1024)
 
@@ -77,57 +77,9 @@ function Hero({ isPreloaderFinished = true }) {
     window.addEventListener('scroll', onScroll, { passive: true })
     window.addEventListener('resize', onScroll)
 
-    // Scroll Lock Logic (The "Wall")
-    // Keeps the scene pinned exactly at the end of the text animation until the video finishes
-    let touchStartY = 0
-    const handleTouchStart = (e) => {
-      touchStartY = e.touches[0].clientY
-    }
-
-    const preventForwardScroll = (e) => {
-      const video = videoRef.current
-      if (!sectionRef.current || !video || video.ended) return
-
-      const sectionTop = sectionRef.current.offsetTop
-      const sectionHeight = sectionRef.current.offsetHeight
-      const maxScrollable = sectionHeight - window.innerHeight
-      const wallScrollY = sectionTop + maxScrollable * 0.51 // Stop before text begins to fade out
-
-      // Only evaluate block if we are pressed against the wall.
-      // We give it a ceiling (+150px) so if the user bypasses it entirely via a link, it doesn't snap them backwards.
-      if (window.scrollY >= wallScrollY - 10 && window.scrollY <= wallScrollY + 150) {
-        let isMovingDown = false
-
-        if (e.type === 'wheel') {
-          isMovingDown = e.deltaY > 0
-        } else if (e.type === 'touchmove') {
-          isMovingDown = touchStartY > e.touches[0].clientY
-        } else if (e.type === 'keydown') {
-          const downKeys = ['ArrowDown', 'Space', 'PageDown', 'End']
-          isMovingDown = downKeys.includes(e.code) || (e.code === 'Space' && !e.shiftKey)
-        }
-
-        if (isMovingDown) {
-          e.preventDefault() // Block scroll!
-          // Force scroll position neatly on the wall frame if jittered
-          window.scrollTo({ top: wallScrollY, behavior: 'instant' })
-        }
-      }
-    }
-
-    // Attach non-passive listeners for the wall
-    window.addEventListener('wheel', preventForwardScroll, { passive: false })
-    window.addEventListener('touchmove', preventForwardScroll, { passive: false })
-    window.addEventListener('keydown', preventForwardScroll, { passive: false })
-    window.addEventListener('touchstart', handleTouchStart, { passive: false })
-
     return () => {
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('resize', onScroll)
-      window.removeEventListener('wheel', preventForwardScroll)
-      window.removeEventListener('touchmove', preventForwardScroll)
-      window.removeEventListener('keydown', preventForwardScroll)
-      window.removeEventListener('touchstart', handleTouchStart)
     }
   }, [])
 
@@ -158,15 +110,73 @@ function Hero({ isPreloaderFinished = true }) {
   const bottomBarDismissProgress = clamp((progress - bottomBarDismissStart) / 0.008, 0, 1)
   const bottomBarTranslateY = isImageExpanded ? 100 : bottomBarDismissProgress * 100
   const bottomBarOpacity = isImageExpanded ? 0 : 1 - bottomBarDismissProgress
-  const textFadeInProgress = clamp((progress - textFadeInStart) / (textFadeInEnd - textFadeInStart), 0, 1)
-  const textFadeOutProgress = clamp((progress - textFadeOutStart) / (textFadeOutEnd - textFadeOutStart), 0, 1)
-  const textOpacity = progress >= textFadeInStart && progress < textFadeOutEnd
-    ? (progress < textFadeOutStart ? textFadeInProgress : 1 - textFadeOutProgress)
-    : 0
-  const videoFadeOutProgress = clamp((progress - videoFadeOutStart) / (videoFadeOutEnd - videoFadeOutStart), 0, 1)
-  const videoOpacity = progress >= videoStart && progress < videoFadeOutEnd
-    ? (progress < videoFadeOutStart ? 1 : 1 - videoFadeOutProgress)
-    : 0
+  const textOpacityProg = clamp((progress - textFadeInStart) / (textFadeInEnd - textFadeInStart), 0, 1)
+  const textFadeOutProg = clamp((progress - textFadeOutStart) / (textFadeOutEnd - textFadeOutStart), 0, 1)
+  const isTextVisible = progress >= textFadeInStart && progress < textFadeOutEnd
+  const textOpacity = isTextVisible ? (progress > textFadeOutStart ? 1 - textFadeOutProg : textOpacityProg) : 0
+
+  const isVideoVisible = progress >= videoStart && progress < videoFadeOutEnd
+  const videoOpacityProg = clamp((progress - videoStart) / (videoScrubEnd - videoStart), 0, 1)
+  const videoFadeOutProg = clamp((progress - videoFadeOutStart) / (videoFadeOutEnd - videoFadeOutStart), 0, 1)
+  const videoOpacity = isVideoVisible ? (progress > videoFadeOutStart ? 1 - videoFadeOutProg : videoOpacityProg) : 0
+
+  const scrubRatio = clamp((progress - videoStart) / (videoFadeOutStart - videoStart), 0, 1)
+  const totalFrames = frames.length
+
+  // Preload frames to keep scrolling buttery smooth
+  useLayoutEffect(() => {
+    sequenceImagesRef.current = frames.map(src => {
+      const img = new Image()
+      img.src = src
+      return img
+    })
+  }, [])
+
+  // High-performance canvas paint
+  useLayoutEffect(() => {
+    const canvas = sequenceCanvasRef.current
+    if (!canvas || frames.length === 0) return
+    const ctx = canvas.getContext('2d', { alpha: false }) // Optimize for opaque images
+    
+    // Only process drawing if sequence is within view bounds
+    const isSequenceVisible = progress >= videoStart && progress < videoFadeOutEnd
+    if (!isSequenceVisible) return
+
+    const currentFrameIndex = Math.min(Math.max(Math.floor(scrubRatio * totalFrames), 0), totalFrames - 1)
+    const img = sequenceImagesRef.current[currentFrameIndex]
+
+    if (img && img.complete) {
+      const { clientWidth, clientHeight } = canvas
+      
+      // Handle high DPI resizing
+      const dpr = window.devicePixelRatio || 1
+      if (canvas.width !== clientWidth * dpr || canvas.height !== clientHeight * dpr) {
+        canvas.width = clientWidth * dpr
+        canvas.height = clientHeight * dpr
+        ctx.scale(dpr, dpr)
+      }
+
+      // Object-cover calculation
+      const canvasRatio = clientWidth / clientHeight
+      const imgRatio = img.width / img.height
+      let drawWidth = clientWidth
+      let drawHeight = clientHeight
+      let offsetX = 0
+      let offsetY = 0
+
+      if (canvasRatio > imgRatio) {
+        drawHeight = clientWidth / imgRatio
+        offsetY = (clientHeight - drawHeight) / 2
+      } else {
+        drawWidth = clientHeight * imgRatio
+        offsetX = (clientWidth - drawWidth) / 2
+      }
+
+      ctx.imageSmoothingEnabled = true
+      ctx.imageSmoothingQuality = 'high'
+      ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight)
+    }
+  }, [progress, scrubRatio, videoStart, videoFadeOutEnd])
   const transitionClass = isReady
     ? 'transition-all duration-[1300ms] ease-[cubic-bezier(0.16,1,0.3,1)]'
     : 'transition-none'
@@ -286,24 +296,7 @@ function Hero({ isPreloaderFinished = true }) {
       })
     })
   }, [progress, textOpacity])
-
-  // Play video smoothly when in view instead of scrubbing frame-by-frame
-  useEffect(() => {
-    const video = videoRef.current
-    if (!video) return
-
-    video.playbackRate = 2 // Speed up the video playback
-
-    // Allow native playback for perfectly smooth 60fps instead of chopping
-    const isVideoVisible = progress >= videoStart && progress < videoFadeOutEnd
-    
-    if (isVideoVisible && video.paused && !video.ended) {
-      video.play().catch(() => {}) // Catch autoplay blocks on iOS
-    } else if (!isVideoVisible && !video.paused) {
-      video.pause()
-    }
-  }, [progress, videoStart, videoFadeOutEnd])
-
+  
   useEffect(() => {
     if (!sectionRef.current || isMobile) return
 
@@ -440,20 +433,8 @@ function Hero({ isPreloaderFinished = true }) {
                   className="pointer-events-none absolute inset-0 z-0 overflow-hidden transition-opacity duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] flex items-end justify-center"
                   style={{ opacity: videoOpacity }}
                 >
-                  <video
-                    ref={videoRef}
-                    src={heroVideo}
-                    muted
-                    playsInline
-                    disablePictureInPicture
-                    disableRemotePlayback
-                    webkit-playsinline="true"
-                    preload="auto"
-                    onLoadedMetadata={(event) => {
-                      setVideoDuration(event.currentTarget.duration || 0)
-                      smoothedVideoTimeRef.current = 0
-                      targetVideoTimeRef.current = 0
-                    }}
+                  <canvas
+                    ref={isMobile ? sequenceCanvasRef : null}
                     className="h-full opacity-80 w-full object-cover origin-bottom"
                     style={{ transform: 'rotateY(180deg) translateZ(0)', willChange: 'transform' }}
                   />
@@ -776,26 +757,14 @@ function Hero({ isPreloaderFinished = true }) {
               />
 
               <div
-                className="pointer-events-none absolute inset-0 z-0 overflow-hidden transition-opacity duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] flex items-end justify-center"
+                className="pointer-events-none absolute inset-0 z-0 overflow-hidden flex items-end justify-center"
                 style={{ opacity: videoOpacity }}
               >
-                <video
-                  ref={videoRef}
-                  src={heroVideo}
-                  muted
-                  playsInline
-                  disablePictureInPicture
-                  disableRemotePlayback
-                  webkit-playsinline="true"
-                  preload="auto"
-                  onLoadedMetadata={(event) => {
-                    setVideoDuration(event.currentTarget.duration || 0)
-                    smoothedVideoTimeRef.current = 0
-                    targetVideoTimeRef.current = 0
-                  }}
-                  className="max-h-screen lg:h-screen max-w-6xl opacity-80 w-full object-cover origin-bottom"
-                  style={{ transform: 'rotateY(180deg) translateZ(0)', willChange: 'transform' }}
-                />
+                  <canvas
+                    ref={!isMobile ? sequenceCanvasRef : null}
+                    className="max-h-screen lg:h-screen max-w-6xl opacity-80 w-full origin-bottom"
+                    style={{ transform: 'rotateY(180deg) translateZ(0)', willChange: 'transform' }}
+                  />
               </div>
             </div>
 
