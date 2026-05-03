@@ -33,6 +33,10 @@ function Hero({ isPreloaderFinished = true }) {
   const basedRef = useRef(null)
   const paragraphRef = useRef(null)
   const firstSceneMetaRef = useRef(null)
+  const passionTextRef = useRef(null)
+  const passionTextMobileRef = useRef(null);
+  const passionAnimRef = useRef(null);
+  const trustBadgeRef = useRef(null);
   const portfolioWordRefs = useRef([])
   const designWordRefs = useRef([])
   const transitionTextRef = useRef(null)
@@ -212,6 +216,42 @@ function Hero({ isPreloaderFinished = true }) {
     { src: linkedinIcon, alt: 'LinkedIn', link: 'https://www.linkedin.com/in/aman-singh-kaushik-1a37a81a4/' },
   ]
 
+  // Trigger Passion text reveal animation on load
+  useEffect(() => {
+    if (!isPreloaderFinished) return;
+    
+    const ctx = gsap.context(() => {
+      const desktopWords = passionTextRef.current?.querySelectorAll('.passion-word');
+      const mobileWords = passionTextMobileRef.current?.querySelectorAll('.passion-word');
+
+      passionAnimRef.current = gsap.timeline({ paused: true });
+
+      const animationProps = {
+        clipPath: 'inset(0% 0% 0% 0%)',
+        duration: 1.5,
+        stagger: 0.2, // Noticeable slight delay between each word
+        ease: "power3.inOut"
+      };
+
+      if (desktopWords && desktopWords.length > 0) {
+        passionAnimRef.current.to(desktopWords, animationProps, 0);
+      }
+      if (mobileWords && mobileWords.length > 0) {
+        passionAnimRef.current.to(mobileWords, animationProps, 0);
+      }
+      
+      if (trustBadgeRef.current) {
+        passionAnimRef.current.to(trustBadgeRef.current, { opacity: 1, y: 0, duration: 1.5, ease: 'power3.inOut' }, 0.4);
+      }
+
+      // Play the animation on load with the delay
+      setTimeout(() => {
+        if (passionAnimRef.current) passionAnimRef.current.play();
+      }, 200);
+    });
+    return () => ctx.revert();
+  }, [isPreloaderFinished]);
+
   useEffect(() => {
     const fadeProgress = clamp(
       (progress - firstSceneFadeStart) / (firstSceneFadeEnd - firstSceneFadeStart),
@@ -244,6 +284,28 @@ function Hero({ isPreloaderFinished = true }) {
       gsap.set(firstSceneMetaRef.current, {
         y: -18 * fadeProgress,
         opacity: 0.85 * (1 - fadeProgress),
+      })
+    }
+
+    if (passionTextRef.current) {
+      gsap.set(passionTextRef.current, {
+        y: -18 * fadeProgress,
+        opacity: 0.9 * (1 - fadeProgress),
+      })
+      if (passionAnimRef.current) {
+        // Trigger reverse to gracefully stagger out when scrolling down
+        if (fadeProgress > 0.02) {
+          passionAnimRef.current.reverse();
+        } else {
+          passionAnimRef.current.play();
+        }
+      }
+    }
+
+    if (passionTextMobileRef.current) {
+      gsap.set(passionTextMobileRef.current, {
+        y: -18 * fadeProgress,
+        opacity: 0.9 * (1 - fadeProgress),
       })
     }
 
@@ -428,6 +490,16 @@ function Hero({ isPreloaderFinished = true }) {
                   alt="Portrait"
                   className={`pointer-events-none absolute bottom-0 left-1/2 z-20 h-[65vh] w-auto max-w-none -translate-x-1/2 origin-bottom object-cover ${isImageExpanded ? 'scale-100' : 'scale-[0.85]'}`}
                 />
+                
+                {/* Passion Text Mobile Inside Portrait Wrapper */}
+                <div ref={passionTextMobileRef} className="absolute right-2 sm:right-10 bottom-16 sm:bottom-20 z-30 flex flex-col items-start opacity-90 lg:hidden pointer-events-none">
+                  <div className="font-clash-display font-bold text-[50px] sm:text-[70px] tracking-tighter uppercase text-[#111] flex flex-col items-start" style={{ lineHeight: 0.85 }}>
+                    <div className="passion-word" style={{ clipPath: 'inset(0% 100% 0% 0%)' }}>Passion</div>
+                    <div className="passion-word" style={{ clipPath: 'inset(0% 100% 0% 0%)' }}>Ambition</div>
+                    <div className="passion-word" style={{ clipPath: 'inset(0% 100% 0% 0%)' }}>Vision</div>
+                  </div>
+                </div>
+
                 {/* Video scrub */}
                 <div
                   className="pointer-events-none absolute inset-0 z-0 overflow-hidden transition-opacity duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] flex items-end justify-center"
@@ -755,6 +827,43 @@ function Hero({ isPreloaderFinished = true }) {
                 className={`pointer-events-none absolute bottom-0 left-1/2 z-20 h-[55vh] w-auto max-w-none lg:h-full lg:max-h-none lg:w-auto -translate-x-1/2 origin-bottom object-cover ${isImageExpanded ? 'scale-100 lg:scale-[0.92]' : 'scale-[0.85] lg:scale-[0.75]'
                   }`}
               />
+
+              {/* Passion Text Desktop Inside Portrait Wrapper */}
+              <div ref={passionTextRef} className="absolute left-[50%] ml-[140px] lg:ml-[180px] xl:ml-[220px] 2xl:ml-[260px] bottom-24 lg:bottom-24 z-30 hidden lg:flex flex-col items-start opacity-90 transition-opacity duration-500 pointer-events-none">
+                <div className="font-clash-display font-bold text-[70px] lg:text-[85px] xl:text-[100px] 2xl:text-[120px] tracking-tighter uppercase text-[#111] flex flex-col items-start" style={{ lineHeight: 0.85 }}>
+                  <div className="passion-word" style={{ clipPath: 'inset(0% 100% 0% 0%)' }}>Passion</div>
+                  <div className="passion-word" style={{ clipPath: 'inset(0% 100% 0% 0%)' }}>Ambition</div>
+                  <div className="passion-word" style={{ clipPath: 'inset(0% 100% 0% 0%)' }}>Vision</div>
+                </div>
+              </div>
+
+              {/* Trust Badge Desktop */}
+              {/* <div ref={trustBadgeRef} className="absolute right-[60%] mr-[140px] lg:mr-[180px] xl:mr-[220px] 2xl:mr-[260px] bottom-24 z-30 hidden lg:flex flex-col items-start opacity-0 translate-y-8 pointer-events-auto">
+                 <div className="bg-[#111]/95 backdrop-blur-xl text-white p-5 rounded-2xl border border-white/10 shadow-2xl flex flex-col gap-3 w-[260px] hover:-translate-y-2 transition-transform duration-500 cursor-default">
+                    <div className="flex items-center gap-3">
+                       <div className="flex -space-x-2">
+                         <div className="w-9 h-9 rounded-full border-2 border-[#111] bg-gray-200 overflow-hidden shrink-0">
+                           <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" alt="Client" className="w-full h-full object-cover" />
+                         </div>
+                         <div className="w-9 h-9 rounded-full border-2 border-[#111] bg-gray-300 overflow-hidden shrink-0">
+                           <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=100&q=80" alt="Client" className="w-full h-full object-cover" />
+                         </div>
+                         <div className="w-9 h-9 rounded-full border-2 border-[#111] bg-gray-400 overflow-hidden shrink-0">
+                           <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80" alt="Client" className="w-full h-full object-cover" />
+                         </div>
+                       </div>
+                       <div className="flex flex-col justify-center">
+                         <div className="flex text-yellow-400">
+                           {[1,2,3,4,5].map(i => <svg key={i} className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>)}
+                         </div>
+                         <span className="text-[10px] uppercase tracking-wider text-gray-300 font-medium mt-0.5">5.0 Client Rating</span>
+                       </div>
+                    </div>
+                    <p className="text-sm font-medium leading-snug text-gray-200">
+                      Delivering exceptional digital experiences for global brands.
+                    </p>
+                 </div>
+              </div> */}
 
               <div
                 className="pointer-events-none absolute inset-0 z-0 overflow-hidden flex items-end justify-center"

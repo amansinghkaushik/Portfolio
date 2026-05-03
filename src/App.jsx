@@ -4,6 +4,7 @@ import Navbar from './components/Navbar'
 import CursorFollower from './components/CursorFollower'
 import Hero from './components/Hero'
 import QuoteSection from './components/QuoteSection'
+import TechStackSection from './components/TechStackSection'
 import WorkSection from './components/WorkSection'
 import AboutSection from './components/AboutSection'
 import ExperienceSection from './components/ExperienceSection'
@@ -25,6 +26,7 @@ function App() {
       >
         <Hero isPreloaderFinished={isPreloaderFinished} />
         <QuoteSection />
+        <TechStackSection />
         <WorkSection />
         <AboutSection />
         <ExperienceSection />

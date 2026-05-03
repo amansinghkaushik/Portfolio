@@ -1,9 +1,9 @@
 export const testimonialsData = [
   {
-    quote: "Working with Aman was seamless from start to finish. He understood our goals quickly, asked the right questions, and delivered a design system that scaled perfectly with our growing app.",
-    name: "Daniel Reed",
-    role: "Founder of NovaLabs",
-    avatar: "https://i.pravatar.cc/150?img=11"
+    quote: "WOW, mtlb ab kya hi bolu, aisa lagta hai ki orgasm ho rha hai. Working with Aman is like taking it deep - enjoy the moment without any worry``",
+    name: "Hone wala umm...",
+    role: "(Hidden due to privacy 😜👅)",
+    avatar: "https://i.pravatar.cc/150?img=11´"
   },
   {
     quote: "Aman brought our product vision to life with incredible attention to detail. His ability to balance business needs with user empathy made our platform not just beautiful — but genuinely useful.",
