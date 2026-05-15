@@ -1,11 +1,5 @@
 export const testimonialsData = [
   {
-    quote: "WOW, mtlb ab kya hi bolu, aisa lagta hai ki orgasm ho rha hai. Working with Aman is like taking it deep - enjoy the moment without any worry``",
-    name: "Hone wala umm...",
-    role: "(Hidden due to privacy 😜👅)",
-    avatar: "https://i.pravatar.cc/150?img=11´"
-  },
-  {
     quote: "Aman brought our product vision to life with incredible attention to detail. His ability to balance business needs with user empathy made our platform not just beautiful — but genuinely useful.",
     name: "Sarah Nguyen",
     role: "Product Manager at FlowSync",
