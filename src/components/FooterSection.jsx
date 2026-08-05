@@ -42,16 +42,16 @@ function FooterSection() {
         {/* Top Right Links */}
         <div className="flex gap-8 md:gap-32 text-base font-medium text-white/90">
           <div className="flex flex-col gap-1 items-end">
-            <a href="/#hero" className="hover:text-white/60 transition-colors">Home</a>
-            <a href="/#work" className="hover:text-white/60 transition-colors">Work</a>
-            <a href="/#about" className="hover:text-white/60 transition-colors">About</a>
-            <a href="/contact" className="hover:text-white/60 transition-colors mt-1">Contact</a>
+            <a href="/#hero" className="hover:text-[#FF3D3D] transition-colors">Home</a>
+            <a href="/#work" className="hover:text-[#FF3D3D] transition-colors">Work</a>
+            <a href="/#about" className="hover:text-[#FF3D3D] transition-colors">About</a>
+            <a href="/contact" className="hover:text-[#FF3D3D] transition-colors mt-1">Contact</a>
           </div>
           <div className="flex flex-col gap-1 items-end">
-            <a href="#" className="hover:text-white/60 transition-colors">Style Guide</a>
-            <a href="#" className="hover:text-white/60 transition-colors">Components</a>
-            <a href="#" className="hover:text-white/60 transition-colors">Licenses</a>
-            <a href="#" className="hover:text-white/60 transition-colors">Changelog</a>
+            <a href="#" className="hover:text-[#FF3D3D] transition-colors">Style Guide</a>
+            <a href="#" className="hover:text-[#FF3D3D] transition-colors">Components</a>
+            <a href="#" className="hover:text-[#FF3D3D] transition-colors">Licenses</a>
+            <a href="#" className="hover:text-[#FF3D3D] transition-colors">Changelog</a>
           </div>
         </div>
       </div>
@@ -63,10 +63,10 @@ function FooterSection() {
         {/* Socials & Copyright */}
         <div className="flex flex-col md:flex-row justify-between items-center text-sm font-medium text-white/50 mb-10 px-2">
           <div className="flex flex-wrap justify-center gap-4 md:gap-6 w-full md:w-auto">
-            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Twitter (X)</a>
-            <a href="https://www.instagram.com/aman_singh_kaushik_/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Instagram</a>
-            <a href="https://github.com/amansinghkaushik" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">GitHub</a>
-            <a href="https://www.linkedin.com/in/aman-singh-kaushik-1a37a81a4/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">LinkedIn</a>
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-[#FF3D3D] transition-colors">Twitter (X)</a>
+            <a href="https://www.instagram.com/aman_singh_kaushik_/" target="_blank" rel="noopener noreferrer" className="hover:text-[#FF3D3D] transition-colors">Instagram</a>
+            <a href="https://github.com/amansinghkaushik" target="_blank" rel="noopener noreferrer" className="hover:text-[#FF3D3D] transition-colors">GitHub</a>
+            <a href="https://www.linkedin.com/in/aman-singh-kaushik-1a37a81a4/" target="_blank" rel="noopener noreferrer" className="hover:text-[#FF3D3D] transition-colors">LinkedIn</a>
           </div>
           <div className="mt-8 md:mt-0 text-center w-full md:w-auto">
             Powered by React. Created by Aman.
@@ -74,8 +74,8 @@ function FooterSection() {
         </div>
 
         {/* Huge Typography */}
-        <div className="w-full flex justify-center items-center overflow-hidden border-t border-white/10 pt-4">
-          <h1 className="text-[13vw] sm:text-[16vw] leading-[0.8] font-semibold uppercase tracking-[-0.04em] text-white whitespace-nowrap select-none font-clash-display">
+        <div className="w-full flex justify-center items-center border-t border-white/10 pt-4 pb-8">
+          <h1 className="text-[13vw] sm:text-[16vw] leading-[0.85] uppercase tracking-[0.05em] text-white whitespace-nowrap select-none font-atelier">
             ASK<br/> CREATIONS
           </h1>
         </div>

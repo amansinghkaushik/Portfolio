@@ -5,6 +5,7 @@ import { Link, useLocation } from 'react-router-dom'
 
 function Navbar({ isPreloaderFinished = true }) {
   const [isOpen, setIsOpen] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
   const [dateTime, setDateTime] = useState('')
   const location = useLocation()
   const isSubPage = location.pathname !== '/'
@@ -29,7 +30,17 @@ function Navbar({ isPreloaderFinished = true }) {
     updateDateTime()
     const interval = setInterval(updateDateTime, 1000)
 
-    return () => clearInterval(interval)
+    const handleScroll = () => {
+      // Scene 1 fades out around 80% of viewport height
+      setIsScrolled(window.scrollY > window.innerHeight * 0.8)
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll()
+
+    return () => {
+      clearInterval(interval)
+      window.removeEventListener('scroll', handleScroll)
+    }
   }, [])
 
   const handleNavClick = (e, targetId) => {
@@ -50,7 +61,7 @@ function Navbar({ isPreloaderFinished = true }) {
   }
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 border-b border-black/10 bg-black px-4 md:px-[30px] z-[100] transition-transform duration-1000 delay-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${isPreloaderFinished ? 'translate-y-0' : '-translate-y-full'}`}>
+    <nav className={`fixed top-0 left-0 right-0 px-4 md:px-[30px] z-[100] transition-all duration-1000 delay-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${isPreloaderFinished ? 'translate-y-0' : '-translate-y-full'} ${isScrolled ? 'bg-black py-1 shadow-lg' : 'bg-transparent'}`}>
       {/* Inner NavBar */}
       <div className="flex items-center justify-between py-[10px] text-white relative">
 
@@ -90,7 +101,11 @@ function Navbar({ isPreloaderFinished = true }) {
         </div>
 
         {/* Element 3 - Menu Button or Navigation */}
-        <div className="flex-1 flex justify-end items-center gap-7 md:overflow-hidden">
+        <div 
+          className="flex-1 flex justify-end items-center gap-7 md:overflow-hidden"
+          onMouseEnter={() => window.innerWidth >= 768 && setIsOpen(true)}
+          onMouseLeave={() => window.innerWidth >= 768 && setIsOpen(false)}
+        >
           <div
             className={`
               absolute top-0 -left-4 -right-4 h-[100dvh] bg-black flex-col items-center justify-center gap-10 -z-10
@@ -103,27 +118,27 @@ function Navbar({ isPreloaderFinished = true }) {
           >
             <a
               href="/#work"
-              className="group relative text-4xl md:text-sm font-medium transition-colors duration-300 hover:text-blue-700 whitespace-nowrap"
+              className="group relative text-4xl md:text-sm font-medium transition-colors duration-300 hover:text-red-500 whitespace-nowrap"
               onClick={(e) => handleNavClick(e, 'work')}
             >
               Works
-              <span className="absolute -bottom-1 md:-bottom-1.5 left-0 h-[3px] md:h-[1.5px] w-full origin-left scale-x-0 bg-blue-700 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-x-100" />
+              <span className="absolute -bottom-1 md:-bottom-1.5 left-0 h-[3px] md:h-[1.5px] w-full origin-left scale-x-0 bg-red-500 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-x-100" />
             </a>
             <a
               href="/#about"
-              className="group relative text-4xl md:text-sm font-medium transition-colors duration-300 hover:text-blue-700 whitespace-nowrap"
+              className="group relative text-4xl md:text-sm font-medium transition-colors duration-300 hover:text-red-500 whitespace-nowrap"
               onClick={(e) => handleNavClick(e, 'about')}
             >
               About
-              <span className="absolute -bottom-1 md:-bottom-1.5 left-0 h-[3px] md:h-[1.5px] w-full origin-left scale-x-0 bg-blue-700 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-x-100" />
+              <span className="absolute -bottom-1 md:-bottom-1.5 left-0 h-[3px] md:h-[1.5px] w-full origin-left scale-x-0 bg-red-500 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-x-100" />
             </a>
             <Link
               to="/contact"
-              className="group relative text-4xl md:text-sm font-medium transition-colors duration-300 hover:text-blue-700 whitespace-nowrap"
+              className="group relative text-4xl md:text-sm font-medium transition-colors duration-300 hover:text-red-500 whitespace-nowrap"
               onClick={() => setIsOpen(false)}
             >
               Contact
-              <span className="absolute -bottom-1 md:-bottom-1.5 left-0 h-[3px] md:h-[1.5px] w-full origin-left scale-x-0 bg-blue-700 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-x-100" />
+              <span className="absolute -bottom-1 md:-bottom-1.5 left-0 h-[3px] md:h-[1.5px] w-full origin-left scale-x-0 bg-red-500 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-x-100" />
             </Link>
           </div>
           <div className="transition-all duration-400 ease-in-out z-50 shrink-0">

@@ -10,6 +10,14 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: "Atelier";
+  src: url("./assets/fonts/Atelier.otf") format("opentype");
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --bg-page: #ececec;
   --bg-surface: #f7f8fa;
@@ -97,12 +105,13 @@
   }
 
   .ds-heading-xl {
-    font-family: "Clash Display", sans-serif;
+    font-family: "Atelier", sans-serif;
     font-size: clamp(3rem, 6vw, 6.875rem);
     /* ~48px to ~110px */
     line-height: 1.0;
-    letter-spacing: -0.03em;
+    letter-spacing: 0.05em;
     font-weight: 500;
+    text-transform: uppercase;
   }
 
   .ds-heading-lg {
@@ -112,6 +121,7 @@
     line-height: 1.05;
     letter-spacing: -0.02em;
     font-weight: 500;
+    text-transform: uppercase;
   }
 
   .ds-heading-md {
@@ -163,6 +173,10 @@
     font-family: "Condenso", "Arial Narrow", "Helvetica Neue", sans-serif;
   }
 
+  .font-atelier {
+    font-family: "Atelier", "Georgia", serif;
+  }
+
   .font-gochi-hand {
     font-family: "Gochi Hand", cursive;
   }
@@ -197,5 +211,33 @@
 
   .animate-menu-close {
     animation: slideOutToButton 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  @keyframes marquee {
+    0% {
+      transform: translateX(0%);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  .animate-marquee {
+    animation: marquee 30s linear infinite;
+    display: flex;
+    width: max-content;
+  }
+
+  .animate-marquee:hover {
+    animation-play-state: paused;
+  }
+
+  @keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .animate-spin-slow {
+    animation: spin-slow 12s linear infinite;
   }
 }

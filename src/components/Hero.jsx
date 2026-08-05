@@ -3,10 +3,11 @@ import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { FaInstagram, FaFacebookF, FaGithub, FaEnvelope } from 'react-icons/fa'
 import astrick from '../assets/astrikshape.png'
 import taglineMockup from '../assets/taginmockup.png'
 
-import amanBg from '../assets/AmanBG.png'
+import heroImage from '../assets/HeroImage.png'
 import arrowIcon from '../assets/Arrow.svg'
 import figmaIcon from '../assets/figma.svg'
 import framerIcon from '../assets/framer.svg'
@@ -38,9 +39,33 @@ function Hero({ isPreloaderFinished = true }) {
   const passionAnimRef = useRef(null);
   const trustBadgeRef = useRef(null);
   const portfolioWordRefs = useRef([])
+  const portfolioAnimRef = useRef(null)
   const designWordRefs = useRef([])
   const transitionTextRef = useRef(null)
   const bentoRef = useRef(null)
+  const subtitleRef = useRef(null)
+  const dShapeRef = useRef(null)
+  const dShapeMobileRef = useRef(null)
+  const socialRefs = useRef([])
+  const ctaRef = useRef(null)
+  const entranceAnimRef = useRef(null)
+  const heroImageRef = useRef(null)
+  const heroImageMobileRef = useRef(null)
+  const bottomBlobRef = useRef(null)
+  const bottomBlobMobileRef = useRef(null)
+  const pillsRefs = useRef([])
+  const heroImageWrapperRef = useRef(null)
+  const heroImageBgRef = useRef(null)
+  const aboutSceneRef = useRef(null)
+  const aboutPillRef = useRef(null)
+  const aboutHeadingLineRefs = useRef([])
+  const aboutStatsRef = useRef(null)
+  const aboutBadgeRef = useRef(null)
+  const aboutLineLeftRef = useRef(null)
+  const aboutLineRightRef = useRef(null)
+  const aboutStatItemRefs = useRef([])
+  const aboutTimelineRef = useRef(null)
+  const aboutTriggered = useRef(false)
   const sequenceCanvasRef = useRef(null)
   const sequenceImagesRef = useRef([])
   const [progress, setProgress] = useState(0)
@@ -68,6 +93,8 @@ function Hero({ isPreloaderFinished = true }) {
   }
 
   useLayoutEffect(() => {
+    // Force scroll to top on load to prevent reversed animations from browser scroll restoration
+    window.scrollTo(0, 0)
     setProgress(getSectionProgress())
     setIsReady(true)
   }, [])
@@ -87,104 +114,28 @@ function Hero({ isPreloaderFinished = true }) {
     }
   }, [])
 
-  const shapeRiseStart = 0.12
-  const shapeRiseEnd = 0.30
-  const firstSceneFadeStart = 0.01
-  const firstSceneFadeEnd = 0.10
-  const videoStart = 0.20
-  const videoScrubEnd = 0.34
-  const videoHoldEnd = 0.44
-  const textFadeInStart = 0.25
-  const textFadeInEnd = 0.30
-  const textFadeOutStart = 0.52
-  const textFadeOutEnd = 0.56
-  const videoFadeOutStart = 0.56
-  const videoFadeOutEnd = 0.61
-  const socialStart = 0.67
-  const imageExpandStart = socialStart
-  const bentoStart = 0.72
+  // ── Phase 1: Fade out all hero text, pills, CTA, social ──
+  const firstSceneFadeStart = 0.05
+  const firstSceneFadeEnd = 0.20
+
+  const p2Start = 0.20
+  const p2End = 0.40
+
+  // ── Phase 3 trigger: auto-play once Phase 2 finishes ──
+  const aboutTriggerPoint = 0.45
+  const orangeStart = 0.35
+  const orangeEnd = 0.45
 
   const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
 
-  const isImageExpanded = progress >= imageExpandStart
-  const isSocialVisible = progress >= socialStart
-  const isBentoVisible = progress >= bentoStart
-  const bentoScrollProgress = clamp((progress - bentoStart) / (1 - bentoStart), 0, 1)
-  const bottomBarDismissStart = Math.max(shapeRiseStart, shapeRiseEnd - 0.05)
+  const bottomBarDismissStart = Math.max(firstSceneFadeStart, firstSceneFadeEnd - 0.03)
   const bottomBarDismissProgress = clamp((progress - bottomBarDismissStart) / 0.008, 0, 1)
-  const bottomBarTranslateY = isImageExpanded ? 100 : bottomBarDismissProgress * 100
-  const bottomBarOpacity = isImageExpanded ? 0 : 1 - bottomBarDismissProgress
-  const textOpacityProg = clamp((progress - textFadeInStart) / (textFadeInEnd - textFadeInStart), 0, 1)
-  const textFadeOutProg = clamp((progress - textFadeOutStart) / (textFadeOutEnd - textFadeOutStart), 0, 1)
-  const isTextVisible = progress >= textFadeInStart && progress < textFadeOutEnd
-  const textOpacity = isTextVisible ? (progress > textFadeOutStart ? 1 - textFadeOutProg : textOpacityProg) : 0
+  const bottomBarTranslateY = bottomBarDismissProgress * 100
+  const bottomBarOpacity = 1 - bottomBarDismissProgress
 
-  const isVideoVisible = progress >= videoStart && progress < videoFadeOutEnd
-  const videoOpacityProg = clamp((progress - videoStart) / (videoScrubEnd - videoStart), 0, 1)
-  const videoFadeOutProg = clamp((progress - videoFadeOutStart) / (videoFadeOutEnd - videoFadeOutStart), 0, 1)
-  const videoOpacity = isVideoVisible ? (progress > videoFadeOutStart ? 1 - videoFadeOutProg : videoOpacityProg) : 0
-
-  const scrubRatio = clamp((progress - videoStart) / (videoFadeOutStart - videoStart), 0, 1)
-  const totalFrames = frames.length
-
-  // Preload frames to keep scrolling buttery smooth
-  useLayoutEffect(() => {
-    sequenceImagesRef.current = frames.map(src => {
-      const img = new Image()
-      img.src = src
-      return img
-    })
-  }, [])
-
-  // High-performance canvas paint
-  useLayoutEffect(() => {
-    const canvas = sequenceCanvasRef.current
-    if (!canvas || frames.length === 0) return
-    const ctx = canvas.getContext('2d', { alpha: false }) // Optimize for opaque images
-    
-    // Only process drawing if sequence is within view bounds
-    const isSequenceVisible = progress >= videoStart && progress < videoFadeOutEnd
-    if (!isSequenceVisible) return
-
-    const currentFrameIndex = Math.min(Math.max(Math.floor(scrubRatio * totalFrames), 0), totalFrames - 1)
-    const img = sequenceImagesRef.current[currentFrameIndex]
-
-    if (img && img.complete) {
-      const { clientWidth, clientHeight } = canvas
-      
-      // Handle high DPI resizing
-      const dpr = window.devicePixelRatio || 1
-      if (canvas.width !== clientWidth * dpr || canvas.height !== clientHeight * dpr) {
-        canvas.width = clientWidth * dpr
-        canvas.height = clientHeight * dpr
-        ctx.scale(dpr, dpr)
-      }
-
-      // Object-cover calculation
-      const canvasRatio = clientWidth / clientHeight
-      const imgRatio = img.width / img.height
-      let drawWidth = clientWidth
-      let drawHeight = clientHeight
-      let offsetX = 0
-      let offsetY = 0
-
-      if (canvasRatio > imgRatio) {
-        drawHeight = clientWidth / imgRatio
-        offsetY = (clientHeight - drawHeight) / 2
-      } else {
-        drawWidth = clientHeight * imgRatio
-        offsetX = (clientWidth - drawWidth) / 2
-      }
-
-      ctx.imageSmoothingEnabled = true
-      ctx.imageSmoothingQuality = 'high'
-      ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight)
-    }
-  }, [progress, scrubRatio, videoStart, videoFadeOutEnd])
-  const transitionClass = isReady
-    ? 'transition-all duration-[1300ms] ease-[cubic-bezier(0.16,1,0.3,1)]'
-    : 'transition-none'
-  const portfolioWordGroups = ['PORT', 'FOLIO']
+  const askWordGroups = ['A', 'S', 'K']
+  const creationsWordGroups = ['C', 'R', 'E', 'A', 'T', 'I', 'O', 'N', 'S']
+  const portfolioWordGroups = [...askWordGroups, ...creationsWordGroups]
   const getPortfolioWordProgress = (index) => {
     // Last-to-first stagger: the right-most segment begins moving first.
     const orderFromLast = portfolioWordGroups.length - 1 - index
@@ -192,44 +143,36 @@ function Hero({ isPreloaderFinished = true }) {
     const end = start + 0.11
     return clamp((progress - start) / (end - start), 0, 1)
   }
-  const shapeRiseProgress = clamp(
-    (progress - shapeRiseStart) / (shapeRiseEnd - shapeRiseStart),
-    0,
-    1,
-  )
-  const shapeRiseEased = 1 - Math.pow(1 - shapeRiseProgress, 2)
-  const shapeCoverProgress = Math.min(shapeRiseEased, 0.85)
-  const shapeRadiusPercent = 0.1 + shapeCoverProgress * 160
-  const toolIcons = [
-    { src: figmaIcon, alt: 'Figma' },
-    { src: framerIcon, alt: 'Framer' },
-    { src: photoshopIcon, alt: 'Photoshop' },
-    { src: reactIcon, alt: 'React' },
-    { src: tailwindIcon, alt: 'Tailwind' },
-    { src: nodeIcon, alt: 'Node.js' },
-    { src: githubIcon, alt: 'GitHub' },
-  ]
+
   const communityIcons = [
-    { src: instagramIcon, alt: 'Instagram', link: 'https://www.instagram.com/aman_singh_kaushik_/' },
-    { src: whatsappIcon, alt: 'WhatsApp', link: 'https://wa.me/919651969409' },
-    { src: githubIcon, alt: 'GitHub', link: 'https://github.com/amansinghkaushik' },
-    { src: linkedinIcon, alt: 'LinkedIn', link: 'https://www.linkedin.com/in/aman-singh-kaushik-1a37a81a4/' },
+    { Icon: FaInstagram, alt: 'Instagram', link: 'https://www.instagram.com/aman_singh_kaushik_/' },
+    { Icon: FaFacebookF, alt: 'Facebook', link: 'https://www.facebook.com/amansinghkaushik' },
+    { Icon: FaGithub, alt: 'GitHub', link: 'https://github.com/amansinghkaushik' },
+    { Icon: FaEnvelope, alt: 'Mail', link: 'mailto:aman@example.com' },
+  ]
+
+
+  const floatingPills = [
+    { label: 'BRANDING', zIndex: 6, top: '50%', left: '30%', rotation: -15 },
+    { label: 'PRODUCT DESIGN', zIndex: 6, top: '80%', left: '25%', rotation: -10 },
+    { label: 'WEB DESIGN', zIndex: 6, top: '60%', left: '65%', rotation: 15 },
+    { label: 'UI/UX DESIGN', zIndex: 6, top: '85%', left: '60%', rotation: 15 },
   ]
 
   // Trigger Passion text reveal animation on load
   useEffect(() => {
     if (!isPreloaderFinished) return;
-    
+
     const ctx = gsap.context(() => {
       const desktopWords = passionTextRef.current?.querySelectorAll('.passion-word');
       const mobileWords = passionTextMobileRef.current?.querySelectorAll('.passion-word');
 
-      passionAnimRef.current = gsap.timeline({ paused: true });
+      passionAnimRef.current = gsap.timeline({ delay: 0.2 });
 
       const animationProps = {
         clipPath: 'inset(0% 0% 0% 0%)',
-        duration: 1.5,
-        stagger: 0.2, // Noticeable slight delay between each word
+        duration: 2.0,
+        stagger: 0.25, // Noticeable slight delay between each word
         ease: "power3.inOut"
       };
 
@@ -239,15 +182,140 @@ function Hero({ isPreloaderFinished = true }) {
       if (mobileWords && mobileWords.length > 0) {
         passionAnimRef.current.to(mobileWords, animationProps, 0);
       }
-      
+
       if (trustBadgeRef.current) {
-        passionAnimRef.current.to(trustBadgeRef.current, { opacity: 1, y: 0, duration: 1.5, ease: 'power3.inOut' }, 0.4);
+        passionAnimRef.current.to(trustBadgeRef.current, { opacity: 1, y: 0, duration: 2.0, ease: 'power3.inOut' }, 0.5);
       }
 
-      // Play the animation on load with the delay
-      setTimeout(() => {
-        if (passionAnimRef.current) passionAnimRef.current.play();
-      }, 200);
+      portfolioAnimRef.current = gsap.timeline({ delay: 0.2 });
+      const portfolioWords = portfolioWordRefs.current.filter(Boolean);
+
+      if (portfolioWords.length > 0) {
+        gsap.set(portfolioWords, { y: '100%', opacity: 0 });
+        portfolioAnimRef.current.to(portfolioWords, {
+          y: '0%',
+          opacity: 1,
+          duration: 1.2,
+          stagger: 0.05,
+          ease: "power3.out"
+        }, 0);
+      }
+
+      const metaHeadings = firstSceneMetaRef.current?.querySelectorAll('.meta-heading');
+      const metaSubheadings = firstSceneMetaRef.current?.querySelectorAll('.meta-subheading');
+
+      if (metaHeadings && metaHeadings.length > 0) {
+        gsap.set(metaHeadings, { y: -20, opacity: 0 });
+        passionAnimRef.current.to(metaHeadings, { y: 0, opacity: 1, duration: 1.5, stagger: 0.15, ease: 'power3.out' }, 0.3);
+      }
+
+      if (metaSubheadings && metaSubheadings.length > 0) {
+        gsap.set(metaSubheadings, { y: -15, opacity: 0 });
+        passionAnimRef.current.to(metaSubheadings, { y: 0, opacity: 1, duration: 1.5, stagger: 0.15, ease: 'power3.out' }, 0.5);
+      }
+
+      const entranceTl = gsap.timeline({ delay: 0.2 });
+
+      if (subtitleRef.current) {
+        gsap.set(subtitleRef.current, { y: 20, opacity: 0 });
+        entranceTl.to(subtitleRef.current, {
+          y: 0,
+          opacity: 1,
+          duration: 1.5,
+          ease: 'power3.out'
+        }, 0);
+      }
+
+      const animateHeroImage = (ref) => {
+        if (ref.current) {
+          gsap.set(ref.current, { clipPath: 'inset(100% 0% 0% 0%)', y: 50, opacity: 1 });
+          entranceTl.to(ref.current, {
+            clipPath: 'inset(0% 0% 0% 0%)',
+            y: 0,
+            duration: 2.0,
+            ease: 'power3.out'
+          }, 0.6);
+        }
+      };
+      animateHeroImage(heroImageRef);
+      animateHeroImage(heroImageMobileRef);
+
+      const animateBottomBlob = (ref) => {
+        if (ref.current) {
+          gsap.set(ref.current, { opacity: 0 });
+          entranceTl.to(ref.current, {
+            opacity: 1,
+            duration: 2.0,
+            ease: 'power3.inOut',
+            force3D: false
+          }, 0.6);
+        }
+      };
+      animateBottomBlob(bottomBlobRef);
+      animateBottomBlob(bottomBlobMobileRef);
+
+      const pills = pillsRefs.current.filter(Boolean);
+      if (pills.length > 0) {
+        pills.forEach((pill, i) => {
+          gsap.set(pill, { y: 40, opacity: 0 });
+          entranceTl.to(pill, {
+            y: 0,
+            opacity: 1,
+            duration: 1.5,
+            ease: 'power3.out'
+          }, 0.6 + i * 0.1);
+
+          const inner = pill.querySelector('.pill-inner');
+          if (inner) {
+            gsap.to(inner, {
+              y: -15,
+              duration: 2 + (i % 3) * 0.5,
+              repeat: -1,
+              yoyo: true,
+              ease: 'sine.inOut',
+              delay: 1.0 + i * 0.2
+            });
+          }
+        });
+      }
+
+      const animateDShape = (ref) => {
+        if (ref.current) {
+          gsap.set(ref.current, { width: '0%' });
+          entranceTl.to(ref.current, {
+            width: '78%',
+            duration: 1.8,
+            ease: 'power3.inOut'
+          }, 0); // starts exactly when staggered text starts
+        }
+      };
+      animateDShape(dShapeRef);
+      animateDShape(dShapeMobileRef);
+
+      if (ctaRef.current) {
+        gsap.set(ctaRef.current, { scale: 0.9, opacity: 0 });
+        entranceTl.to(ctaRef.current, {
+          scale: 1,
+          opacity: 1,
+          duration: 1.2,
+          ease: 'back.out(1.5)'
+        }, 0); // starts at the same time as D-shape
+      }
+
+      const socialLinks = socialRefs.current.filter(Boolean);
+      if (socialLinks.length > 0) {
+        gsap.set(socialLinks, { y: -20, opacity: 0 });
+        entranceTl.to(socialLinks, {
+          y: 0,
+          opacity: 1,
+          duration: 1.2,
+          stagger: 0.2,
+          ease: 'power3.out'
+        }, 0.5); // slightly after D-shape starts
+      }
+
+      entranceAnimRef.current = entranceTl;
+
     });
     return () => ctx.revert();
   }, [isPreloaderFinished]);
@@ -258,6 +326,151 @@ function Hero({ isPreloaderFinished = true }) {
       0,
       1,
     )
+
+    // ── Phase 2: D-shape expand + hero image shrink ──
+    const p2Progress = clamp((progress - p2Start) / (p2End - p2Start), 0, 1)
+    const p2Eased = 1 - Math.pow(1 - p2Progress, 3) // cubic ease-out
+
+
+
+    // ── Phase 3: Orange bg appears at end of morph ──
+    const orangeProgress = clamp((progress - orangeStart) / (orangeEnd - orangeStart), 0, 1)
+
+    // ── Phase 2: D-shape expansion (both desktop & mobile) ──
+    const dShapeBg = gsap.utils.interpolate('#ececec', orangeProgress)
+
+    if (dShapeRef.current) {
+      gsap.set(dShapeRef.current, {
+        width: `${78 + p2Eased * 22}vw`,
+        height: `${48 + p2Eased * 52}vh`,
+        borderTopRightRadius: `${611 * (1 - p2Eased)}px`,
+        borderBottomRightRadius: `${611 * (1 - p2Eased)}px`,
+        backgroundColor: dShapeBg,
+      })
+    }
+    if (dShapeMobileRef.current) {
+      gsap.set(dShapeMobileRef.current, {
+        width: `${78 + p2Eased * 22}vw`,
+        height: `${48 + p2Eased * 52}vh`,
+        borderTopRightRadius: `${40 * (1 - p2Eased)}vw`,
+        borderBottomRightRadius: `${40 * (1 - p2Eased)}vw`,
+        backgroundColor: dShapeBg,
+      })
+    }
+
+    // ── Phase 2: Hero image shrinks to circle with orange bg ──
+    if (heroImageWrapperRef.current) {
+      // Start as a huge circle (full image visible), shrink to 16% radius centered at 62% height
+      const startRadius = 150
+      const endRadius = 16
+      const radius = startRadius - (startRadius - endRadius) * p2Eased
+      const startCy = 100 // anchored at bottom
+      const endCy = 70   // aligned with center of stats
+      const cy = startCy - (startCy - endCy) * p2Eased
+      gsap.set(heroImageWrapperRef.current, {
+        clipPath: `circle(${radius}% at 50% ${cy}%)`,
+      })
+    }
+    
+    if (heroImageBgRef.current) {
+      gsap.set(heroImageBgRef.current, { opacity: orangeProgress })
+    }
+    
+    if (heroImageRef.current) {
+      const startScale = isMobile ? 1 : 0.9
+      const endScale = isMobile ? 0.55 : 0.5
+      gsap.set(heroImageRef.current, {
+        scale: startScale - (startScale - endScale) * p2Eased,
+        yPercent: 15 * p2Eased,
+      })
+    }
+
+    // ── Phase 1: Fade out pills, blobs, CTA, subtitle, social ──
+    if (pillsRefs.current) {
+      pillsRefs.current.forEach(pill => {
+        if (pill) gsap.set(pill, { opacity: 1 - fadeProgress })
+      })
+    }
+    if (bottomBlobRef.current) gsap.set(bottomBlobRef.current, { opacity: 1 - fadeProgress })
+    if (bottomBlobMobileRef.current) gsap.set(bottomBlobMobileRef.current, { opacity: 1 - fadeProgress })
+    if (ctaRef.current) gsap.set(ctaRef.current, { opacity: 1 - fadeProgress, pointerEvents: fadeProgress > 0.5 ? 'none' : 'auto' })
+    if (subtitleRef.current) gsap.set(subtitleRef.current, { opacity: 1 - fadeProgress })
+    if (socialRefs.current) {
+      socialRefs.current.forEach(ref => {
+        if (ref) gsap.set(ref, { opacity: 1 - fadeProgress, pointerEvents: fadeProgress > 0.5 ? 'none' : 'auto' })
+      })
+    }
+    if (portfolioWordRefs.current) {
+      portfolioWordRefs.current.forEach(ref => {
+        if (ref) gsap.set(ref, { opacity: clamp(1 - fadeProgress * 2, 0, 1), yPercent: fadeProgress * 150 })
+      })
+    }
+
+    // ── Phase 3: Trigger auto-play timeline once when Phase 2 completes ──
+    if (progress >= aboutTriggerPoint && !aboutTriggered.current) {
+      aboutTriggered.current = true
+
+      // Show the scene container
+      if (aboutSceneRef.current) {
+        gsap.set(aboutSceneRef.current, { opacity: 1, pointerEvents: 'auto' })
+      }
+
+      // Build the auto-play timeline
+      const tl = gsap.timeline({ defaults: { ease: 'power2.out' } })
+      aboutTimelineRef.current = tl
+
+      // 1) Pill slides up
+      tl.to(aboutPillRef.current, { opacity: 1, y: 0, duration: 0.5 }, 0.1)
+
+      // 2) Heading lines stagger up from behind clip
+      aboutHeadingLineRefs.current.forEach((line, i) => {
+        if (line) {
+          tl.to(line, { opacity: 1, yPercent: 0, duration: 0.6 }, 0.3 + i * 0.12)
+        }
+      })
+
+      // 3) Lines expand outward
+      tl.to(aboutLineLeftRef.current, { scaleX: 1, opacity: 1, duration: 0.6, ease: 'power3.out' }, 0.8)
+      tl.to(aboutLineRightRef.current, { scaleX: 1, opacity: 1, duration: 0.6, ease: 'power3.out' }, 0.8)
+
+      // 4) Stats stagger bottom-to-top
+      const statRevealOrder = [1, 3, 0, 2]
+      statRevealOrder.forEach((idx, order) => {
+        const ref = aboutStatItemRefs.current[idx]
+        if (ref) {
+          tl.to(ref, { opacity: 1, y: 0, duration: 0.5 }, 1.0 + order * 0.12)
+        }
+      })
+
+      // 5) Badge pop with overshoot
+      tl.to(aboutBadgeRef.current, {
+        opacity: 1,
+        scale: 1,
+        duration: 0.6,
+        ease: 'back.out(2.5)',
+      }, 1.6)
+    }
+
+    // ── Scroll back up: reverse the about scene ──
+    if (progress < aboutTriggerPoint - 0.03 && aboutTriggered.current) {
+      aboutTriggered.current = false
+      if (aboutTimelineRef.current) {
+        aboutTimelineRef.current.kill()
+        aboutTimelineRef.current = null
+      }
+      // Reset all about elements
+      if (aboutSceneRef.current) gsap.set(aboutSceneRef.current, { opacity: 0, pointerEvents: 'none' })
+      if (aboutPillRef.current) gsap.set(aboutPillRef.current, { opacity: 0, y: 20 })
+      aboutHeadingLineRefs.current.forEach(line => {
+        if (line) gsap.set(line, { opacity: 0, yPercent: 100 })
+      })
+      if (aboutLineLeftRef.current) gsap.set(aboutLineLeftRef.current, { scaleX: 0, opacity: 0 })
+      if (aboutLineRightRef.current) gsap.set(aboutLineRightRef.current, { scaleX: 0, opacity: 0 })
+      aboutStatItemRefs.current.forEach(ref => {
+        if (ref) gsap.set(ref, { opacity: 0, y: 30 })
+      })
+      if (aboutBadgeRef.current) gsap.set(aboutBadgeRef.current, { opacity: 0, scale: 0 })
+    }
 
     if (welcomeRef.current) {
       gsap.set(welcomeRef.current, {
@@ -309,63 +522,23 @@ function Hero({ isPreloaderFinished = true }) {
       })
     }
 
-    portfolioWordRefs.current.forEach((element, index) => {
-      if (!element) return
-      const wordProgress = getPortfolioWordProgress(index)
-      gsap.set(element, {
-        y: 400 * wordProgress,
-        opacity: 1 - wordProgress,
-      })
-    })
-
-    if (transitionTextRef.current) {
-      gsap.set(transitionTextRef.current, {
-        // Base opacity will only apply to the non-Design texts.
-        // We'll calculate the opacity for the wrapper, but the Design text handles itself!
-        opacity: textOpacity,
-      })
+    if (portfolioAnimRef.current) {
+      if (fadeProgress > 0.02) {
+        portfolioAnimRef.current.reverse();
+      } else {
+        portfolioAnimRef.current.play();
+      }
     }
 
-    // Staggered letters for 'Design.'
-    designWordRefs.current.forEach((el, index) => {
-      if (!el) return
+  }, [progress])
 
-      const letterFadeInStart = textFadeInStart + (index * 0.003)
-      const letterFadeInEnd = letterFadeInStart + 0.04
-
-      const letterFadeOutStart = textFadeOutStart + (index * 0.003)
-      const letterFadeOutEnd = letterFadeOutStart + 0.04
-
-      const fadeInProg = clamp((progress - letterFadeInStart) / (letterFadeInEnd - letterFadeInStart), 0, 1)
-      const fadeOutProg = clamp((progress - letterFadeOutStart) / (letterFadeOutEnd - letterFadeOutStart), 0, 1)
-
-      let letterOpacity = 0
-      let letterY = 30
-
-      if (progress >= letterFadeInStart && progress < letterFadeOutEnd) {
-        if (progress < letterFadeOutStart) {
-          letterOpacity = fadeInProg
-          letterY = 30 * (1 - fadeInProg)
-        } else {
-          letterOpacity = 1 - fadeOutProg
-          letterY = -30 * fadeOutProg
-        }
-      }
-
-      gsap.set(el, {
-        opacity: letterOpacity,
-        y: letterY,
-      })
-    })
-  }, [progress, textOpacity])
-  
   useEffect(() => {
-    if (!sectionRef.current || isMobile) return
+    if (!sectionRef.current) return
 
     const holdTrigger = ScrollTrigger.create({
       trigger: sectionRef.current,
       start: 'bottom bottom',
-      end: () => `+=${window.innerHeight * 0.75}`,
+      end: () => `+=${window.innerHeight}`,
       pin: true,
       pinSpacing: false,
       scrub: true,
@@ -378,32 +551,7 @@ function Hero({ isPreloaderFinished = true }) {
     }
   }, [])
 
-  useEffect(() => {
-    if (!isMobile || !bentoRef.current) return
 
-    const ctx = gsap.context(() => {
-      const cards = bentoRef.current.querySelectorAll('.bento-animate')
-      cards.forEach((el, i) => {
-        gsap.set(el, { opacity: 0, y: 30 })
-        ScrollTrigger.create({
-          trigger: el,
-          start: 'top 90%',
-          once: true,
-          onEnter: () => {
-            gsap.to(el, {
-              opacity: 1,
-              y: 0,
-              duration: 0.7,
-              delay: 0.08 * i,
-              ease: 'power2.out',
-            })
-          },
-        })
-      })
-    }, bentoRef)
-
-    return () => ctx.revert()
-  }, [isMobile])
 
   // ── Mobile: Animated scenes then static bento below ──────────────────────
   if (isMobile) {
@@ -413,67 +561,78 @@ function Hero({ isPreloaderFinished = true }) {
         <section
           id="hero"
           ref={sectionRef}
-          className="relative z-0 h-[500vh] w-full"
-          style={{ backgroundColor: '#ececec' }}
+          className="relative z-0 h-[400vh] w-full"
+          style={{ backgroundColor: '#FF3D3D' }}
         >
           <div
-            className={`sticky top-[56px] flex flex-col h-[calc(100vh-56px)] w-full overflow-hidden bg-[#ececec] ${transitionClass} ${isSocialVisible ? 'px-4 py-4' : 'px-0 py-0'}`}
+            className={`sticky top-0 flex flex-col h-[100vh] pt-[56px] w-full overflow-hidden px-0 pb-0`}
+            style={{ backgroundColor: '#FF3D3D' }}
           >
-            {/* Black circle */}
-            <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
-              <div
-                className="absolute inset-0 bg-black"
-                style={{
-                  clipPath: `circle(${shapeRadiusPercent}% at 50% 50%)`,
-                  WebkitClipPath: `circle(${shapeRadiusPercent}% at 50% 50%)`,
-                }}
-              />
+            {/* Hero Blobs */}
+            <div className="absolute z-[1] pointer-events-none" style={{ left: '-25%', top: '-13%', width: '59%', height: '123%', borderRadius: '50%', background: 'rgba(123, 9, 11, 0.44)', filter: 'blur(121px)' }} />
+            <div ref={bottomBlobMobileRef} className="absolute z-[3] pointer-events-none" style={{ left: '15%', top: '51%', width: '52%', height: '80%' }}>
+              <div className="w-full h-full rounded-[50%]" style={{ background: '#2B2B2B', filter: 'blur(121px)' }} />
             </div>
+            <div className="absolute z-[1] pointer-events-none" style={{ right: '0%', top: '-15%', width: '25%', height: '39%', borderRadius: '50%', background: 'rgba(123, 9, 11, 0.20)', filter: 'blur(121px)' }} />
+            {/* Grey D-shape */}
+            <div ref={dShapeMobileRef} className="absolute bottom-0 z-0 left-0 w-[78%] h-[48%] rounded-r-[40vw] bg-[#C0C0C0]" />
+            {/* Full-bleed hero image */}
+            <img src={heroImage} ref={heroImageMobileRef} alt="hero background" className="absolute z-[5] inset-0 w-full h-full object-cover object-center pointer-events-none select-none" draggable={false} />
+
 
             {/* PORTFOLIO background text & 3-Column Header */}
             <div className={`pointer-events-none absolute inset-0 z-0 w-full h-full transition-opacity duration-1000 ease-out`}>
               {/* Combined Wrapper for 3-Column Text & PORTFOLIO Text */}
               <div className="relative w-full h-[100vh] pt-[120px] pb-[80px] flex flex-col justify-between items-center pointer-events-none z-10">
-                
+
                 {/* 3-Column Meta Info Wrapper */}
                 <div ref={firstSceneMetaRef} className="w-full flex flex-col sm:flex-row justify-between items-start z-20 opacity-80 px-6 sm:px-[8vw] gap-4 sm:gap-0">
                   <div className="flex items-start gap-1 max-w-[100px] lg:max-w-[200px]">
                     <span className="text-sm font-extrabold text-[#f12020] mt-[-1px]">›</span>
                     <div className="flex flex-col gap-1 text-left">
-                      <p className="font-extrabold text-[#111] text-[9px] uppercase tracking-wider">WEB DESIGNER / UI/UX</p>
-                      <p className="text-gray-500 font-medium text-[8px] whitespace-nowrap lg:whitespace-normal">Crafting immersive functional digital experiences.</p>
+                      <p className="font-extrabold text-white text-[9px] uppercase tracking-wider">WEB DESIGNER / UI/UX</p>
+                      <p className="text-white/50 font-medium text-[8px] whitespace-nowrap lg:whitespace-normal">Crafting immersive functional digital experiences.</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-1 max-w-[100px] lg:max-w-[200px] flex">
                     <span className="text-sm font-extrabold text-[#f12020] mt-[-1px]">›</span>
                     <div className="flex flex-col gap-1 text-left">
-                      <p className="font-extrabold text-[#111] text-[9px] uppercase tracking-wider">BASED IN INDIA</p>
-                      <p className="text-gray-500 font-medium text-[8px] whitespace-nowrap lg:whitespace-normal">Delivering scale and quality globally.</p>
+                      <p className="font-extrabold text-white text-[9px] uppercase tracking-wider">BASED IN INDIA</p>
+                      <p className="text-white/50 font-medium text-[8px] whitespace-nowrap lg:whitespace-normal">Delivering scale and quality globally.</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-1 max-w-[100px] lg:max-w-[200px] pointer-events-auto">
                     <span className="text-sm font-extrabold text-[#f12020] mt-[-1px] pointer-events-none">›</span>
                     <div className="flex flex-col gap-3 text-left">
                       <div className="flex flex-col gap-1 pointer-events-none">
-                        <p className="font-extrabold text-[#111] text-[9px] uppercase tracking-wider">7+ HACKATHONS WON</p>
-                        <p className="text-gray-500 font-medium text-[8px] whitespace-nowrap lg:whitespace-normal">Winning solutions built in record time.</p>
+                        <p className="font-extrabold text-white text-[9px] uppercase tracking-wider">7+ HACKATHONS WON</p>
+                        <p className="text-white/50 font-medium text-[8px] whitespace-nowrap lg:whitespace-normal">Winning solutions built in record time.</p>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Solid Filled PORTFOLIO Text */}
-                <div className="w-full flex flex-col items-center overflow-visible">
+                {/* ASK Text — first row */}
+                <div className="w-full overflow-hidden px-4 sm:px-8">
                   <motion.div
-                    className="font-condenso select-none text-[400px] sm:text-[90vw] md:text-[600px] lg:text-[700px] xl:text-[700px] 2xl:text-[750px] uppercase tracking-[0.001em] text-neutral-300 flex flex-col justify-center items-center text-center w-full translate-y-[10%] sm:translate-y-[22%]"
-                    style={{
-                      lineHeight: 0.75,
-                      paddingTop: '0.01em',
-                      paddingBottom: '0.01em'
-                    }}
+                    className="font-atelier select-none text-[32vw] uppercase tracking-[-0.01em] text-white flex justify-between items-center w-full whitespace-nowrap"
+                    style={{ lineHeight: 0.85 }}
                   >
-                    {portfolioWordGroups.map((group, index) => (
-                      <motion.span key={group} ref={(el) => { portfolioWordRefs.current[index] = el }} className="block">
+                    {askWordGroups.map((group, index) => (
+                      <motion.span key={index} ref={(el) => { portfolioWordRefs.current[index] = el }} className="inline-block">
+                        {group}
+                      </motion.span>
+                    ))}
+                  </motion.div>
+                </div>
+                {/* CREATIONS Text — second row */}
+                <div className="w-full overflow-hidden px-4 sm:px-8">
+                  <motion.div
+                    className="font-atelier select-none text-[16vw] uppercase tracking-[0.02em] text-white flex justify-between items-center w-full whitespace-nowrap"
+                    style={{ lineHeight: 0.85 }}
+                  >
+                    {creationsWordGroups.map((group, index) => (
+                      <motion.span key={index + askWordGroups.length} ref={(el) => { portfolioWordRefs.current[index + askWordGroups.length] = el }} className="inline-block">
                         {group}
                       </motion.span>
                     ))}
@@ -486,54 +645,14 @@ function Hero({ isPreloaderFinished = true }) {
             <div className={`relative z-10 flex-1 flex flex-col overflow-hidden ${transitionClass} ${isSocialVisible ? 'rounded-xl' : 'rounded-none'}`}>
               <div className={`relative flex-1 h-full origin-bottom overflow-hidden ${transitionClass} ${isSocialVisible ? 'bg-[#d8d6d8] rounded-xl mb-3' : 'bg-transparent rounded-none mb-0'}`}>
                 <img
-                  src={amanBg}
+                  src={heroImage}
                   alt="Portrait"
                   className={`pointer-events-none absolute bottom-0 left-1/2 z-20 h-[65vh] w-auto max-w-none -translate-x-1/2 origin-bottom object-cover ${isImageExpanded ? 'scale-100' : 'scale-[0.85]'}`}
                 />
-                
-                {/* Passion Text Mobile Inside Portrait Wrapper */}
-                <div ref={passionTextMobileRef} className="absolute right-2 sm:right-10 bottom-16 sm:bottom-20 z-30 flex flex-col items-start opacity-90 lg:hidden pointer-events-none">
-                  <div className="font-clash-display font-bold text-[50px] sm:text-[70px] tracking-tighter uppercase text-[#111] flex flex-col items-start" style={{ lineHeight: 0.85 }}>
-                    <div className="passion-word" style={{ clipPath: 'inset(0% 100% 0% 0%)' }}>Passion</div>
-                    <div className="passion-word" style={{ clipPath: 'inset(0% 100% 0% 0%)' }}>Ambition</div>
-                    <div className="passion-word" style={{ clipPath: 'inset(0% 100% 0% 0%)' }}>Vision</div>
-                  </div>
-                </div>
 
-                {/* Video scrub */}
-                <div
-                  className="pointer-events-none absolute inset-0 z-0 overflow-hidden transition-opacity duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] flex items-end justify-center"
-                  style={{ opacity: videoOpacity }}
-                >
-                  <canvas
-                    ref={isMobile ? sequenceCanvasRef : null}
-                    className="h-full opacity-80 w-full object-cover origin-bottom"
-                    style={{ transform: 'rotateY(180deg) translateZ(0)', willChange: 'transform' }}
-                  />
-                </div>
-              </div>
 
-              {/* Mid-scroll text overlay */}
-              <div
-                className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center text-center"
-                style={{ opacity: textOpacity }}
-              >
-                <div className="absolute left-4 bottom-16 max-w-[260px] text-left text-white">
-                  <p className="text-xs uppercase tracking-[0.24em] text-white/70">Now Creating</p>
-                  <p className="mt-2 text-base leading-relaxed text-white/90">Ideas into campaigns, interfaces, and motion stories that feel handcrafted and unforgettable.</p>
-                </div>
-                <div className="absolute top-8 left-4 text-left text-white max-w-[260px]">
-                  <h1 className="text-6xl font-regular leading-8 tracking-tighter">Built</h1>
-                  <p className="pl-4 text-4xl font-serif font-extralight italic tracking-tighter text-white/95">from instinct,</p>
-                </div>
-                <div className="absolute top-40 right-4 max-w-fit text-right text-white">
-                  <p className="text-4xl leading-[1.2] font-medium text-white/95 mb-1">refined by</p>
-                  <h1 className="text-6xl font-regular italic font-serif tracking-tight">
-                    {['D', 'e', 's', 'i', 'g', 'n', '.'].map((char, index) => (
-                      <span key={index} ref={(el) => designWordRefs.current[index] = el} className="inline-block">{char}</span>
-                    ))}
-                  </h1>
-                </div>
+
+
               </div>
 
               {/* Name card */}
@@ -567,101 +686,7 @@ function Hero({ isPreloaderFinished = true }) {
           </div>
         </section>
 
-        {/* ── Static bento section, just scrolls normally ─────────────────── */}
-        <div ref={bentoRef} className="relative z-10 -mt-[100vh] md:-mt-0 bg-black flex flex-col gap-4 md:grid md:grid-cols-3 md:grid-rows-6 md:gap-4 px-4 pt-4 pb-12">
 
-          {/* CTA – yellow */}
-          <div className="bento-animate relative overflow-hidden rounded-xl bg-[#ece868] p-5 text-[#101010] flex flex-col justify-between min-h-[160px] md:col-span-1 md:row-span-2 transition-transform duration-300 hover:scale-[1.02] hover:shadow-lg">
-            <div className="max-w-[240px]">
-              <p className="font-clash-display text-[1.1rem] md:text-[1.75rem] md:leading-[1.1] leading-tight tracking-[-0.02em] font-medium">
-                Got an <span className="italic font-serif font-medium">idea</span>? Don't let it rest.
-              </p>
-              <p className="mt-2 font-clash-grotesk text-base md:text-lg text-black/80">Let's start working on it.</p>
-            </div>
-            <Link to="/contact" className="mt-4 ml-auto flex w-fit items-center rounded-lg gap-1 border border-black/40 bg-[#efedb7] px-3 py-2 text-xs font-medium text-black/70">
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <rect x="9" y="9" width="11" height="11" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-              </svg>
-              Get in Touch
-            </Link>
-            <img src={arrowIcon} alt="" className="absolute bottom-5 left-5 h-12 w-12 opacity-80" />
-          </div>
-
-          {/* About – blue */}
-          <div className="bento-animate rounded-xl bg-[#eaf2ff] p-5 md:p-7 text-[#12305f] flex flex-col md:flex-row gap-4 md:gap-8 md:items-center md:col-span-2 md:row-span-2 transition-transform duration-300 hover:scale-[1.02] hover:shadow-lg">
-            <p className="font-clash-grotesk text-lg md:text-[1.35rem] flex-1 leading-[1.4] text-[#143467]">
-              As an engineering student and digital designer, I specialize in crafting meaningful UI/UX experiences, visual identities, and logo systems.
-            </p>
-            <img className="h-28 w-28 md:h-48 md:w-48 object-contain transition-transform duration-700" src={astrick} alt="Asterisk" />
-          </div>
-
-          {/* Tools + Social column */}
-          <div className="bento-animate flex flex-col gap-4 md:gap-3 md:row-span-2 md:col-span-1">
-            {/* Tools strip */}
-            <div className="relative flex-1 overflow-hidden rounded-xl bg-[#72e6cc] px-4 py-4 md:py-0 flex items-center min-h-[80px] md:min-h-[120px]">
-              <motion.div
-                className="flex w-max flex-nowrap items-center gap-8 md:gap-10"
-                animate={{ x: ['0%', '-50%'] }}
-                transition={{ duration: 15, ease: 'linear', repeat: Infinity }}
-              >
-                {[...toolIcons, ...toolIcons, ...toolIcons].map((icon, index) => (
-                  <div key={`tool-mobile-${icon.alt}-${index}`} className="shrink-0 flex items-center justify-center">
-                    <img src={icon.src} alt={icon.alt} className="h-12 w-12 md:h-14 md:w-14 rounded-xl md:rounded-2xl object-contain drop-shadow-sm md:drop-shadow-md" />
-                  </div>
-                ))}
-              </motion.div>
-            </div>
-
-            {/* Social icons */}
-            <div className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#7cc4ff] py-4">
-              {communityIcons.map((icon) => (
-                <a key={icon.alt} href={icon.link} target="_blank" rel="noopener noreferrer" className="grid h-14 w-14 place-items-center transition-transform duration-200 hover:scale-125 hover:-translate-y-1">
-                  <img src={icon.src} alt={icon.alt} className="h-10 w-10 rounded-2xl object-contain shadow-sm" />
-                </a>
-              ))}
-            </div>
-          </div>
-
-          {/* Stats */}
-          <div className="bento-animate rounded-xl bg-[#eaf2ff] py-6 px-6 md:p-4 md:col-span-1 md:row-span-2 transition-colors duration-300 hover:bg-white hover:shadow-lg flex items-center justify-center">
-            <div className="grid grid-cols-2 gap-y-6 gap-x-4 md:grid-cols-2 md:grid-rows-2 md:gap-x-6 md:gap-y-6 h-full w-full max-w-[480px] md:px-4 md:py-4">
-              {[['1+', 'Years experience'], ['3+', 'Projects completed'], ['3+', 'Happy clients'], ['98%', 'On-time delivery']].map(([num, label]) => (
-                <div key={label} className="group flex flex-col items-start justify-center text-left transition-transform duration-300 hover:scale-105 hover:translate-x-1">
-                  <p className="font-clash-display text-2xl md:text-3xl font-semibold tracking-tight">{num}</p>
-                  <p className="mt-1 text-sm font-medium leading-[1.1] text-[#5c6375]">{label}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* What I Offer */}
-          <div className="bento-animate rounded-xl bg-[#eaf2ff] p-5 text-[#12305f] md:col-span-1 md:col-start-3 md:row-span-4 md:row-start-3 flex flex-col justify-between">
-            <div className="flex items-center justify-between mb-4 md:px-4 md:py-3">
-              <p className="text-xl md:text-3xl font-light leading-tight tracking-wider font-serif italic text-[#143467]">What <br className="hidden md:inline" />I Offer</p>
-              <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 256 256" fill="none" className="md:h-[4.75rem] md:w-[4.75rem] shrink-0" aria-hidden="true">
-                <path d="M152 70.059L201.539 20.519L235.48 54.461L185.941 104H256V152H185.941L235.48 201.539L201.539 235.48L152 185.941V256H104V185.941L54.46 235.48L20.52 201.539L70.059 152H0V104H70.059L20.519 54.46L54.461 20.52L104 70.059V0H152Z" fill="rgb(0,0,84)" />
-              </svg>
-            </div>
-            <div className="flex flex-col gap-1 md:gap-1.5">
-              {[['BR', 'Branding'], ['UX', 'UI/UX Design'], ['IL', 'Illustration'], ['WD', 'Web Development'], ['VI', 'Visual Identity']].map(([code, label]) => (
-                <div key={code} className="flex items-center gap-3 rounded-[14px] px-2 md:px-3 py-2 md:py-3">
-                  <span className="grid h-8 w-8 place-items-center rounded-[10px] bg-[#bfdbfe] text-xs font-semibold text-[#1e3a8a]">{code}</span>
-                  <p className="text-base md:text-[1.15rem] font-medium text-[#143467]">{label}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Projects mockup */}
-          <a href="#work" className="bento-animate group relative overflow-hidden rounded-xl block min-h-[220px] md:min-h-[80px] cursor-pointer md:col-span-2 md:row-span-2 transition-shadow duration-300 hover:shadow-xl">
-            <div className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-700 ease-out group-hover:scale-110" style={{ backgroundImage: `url(${taglineMockup})` }} />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent transition-opacity duration-300 group-hover:from-black/80" />
-            <div className="absolute bottom-5 right-6 flex items-center gap-3 md:gap-4 md:translate-y-4 md:opacity-0 md:transition-all md:duration-500 md:ease-out md:group-hover:translate-y-0 md:group-hover:opacity-100">
-              <p className="text-right font-clash-display text-3xl md:text-4xl font-semibold text-white">Projects</p>
-              <img src={arrowIcon} alt="" className="h-8 w-8 md:h-10 md:w-10 brightness-0 rotate-90 invert transition-transform duration-500 group-hover:translate-x-2" />
-            </div>
-          </a>
-        </div>
       </>
     )
   }
@@ -670,80 +695,165 @@ function Hero({ isPreloaderFinished = true }) {
     <section
       id="hero"
       ref={sectionRef}
-      className="relative z-0 h-[850vh] w-full"
-      style={{ backgroundColor: '#ececec' }}
+      className="relative z-0 h-[400vh] w-full bg-[#c92424]"
     >
 
       <div
-        className={`sticky top-[56px] w-full flex items-center justify-center ${transitionClass} ${isSocialVisible ? 'px-[30px] py-[30px]' : 'px-0 py-0'} ${isBentoVisible ? 'h-auto overflow-visible lg:h-[calc(100dvh-56px)] lg:overflow-hidden' : 'h-[calc(100dvh-56px)] overflow-hidden'}`}
+        className={`sticky top-0 w-full flex items-center justify-center px-0 py-0 h-[100vh] overflow-hidden`}
       >
-        <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
+        {/* Hero Blobs */}
+        <div className="absolute z-[-1] pointer-events-none" style={{ left: '-25%', top: '-13%', width: '59%', height: '123%', borderRadius: '50%', background: 'rgba(123, 9, 11, 0.44)', filter: 'blur(121px)' }} />
+        <div ref={bottomBlobRef} className="absolute z-[3] pointer-events-none" style={{ left: '15%', top: '51%', width: '52%', height: '80%' }}>
+          <div className="w-full h-full rounded-[50%]" style={{ background: '#2B2B2B', filter: 'blur(121px)' }} />
+        </div>
+        <div className="absolute z-[1] pointer-events-none" style={{ right: '0%', top: '-15%', width: '25%', height: '39%', borderRadius: '50%', background: 'rgba(123, 9, 11, 0.20)', filter: 'blur(121px)' }} />
+
+        {/* Floating Pills */}
+        {/* {floatingPills.map((pill, index) => (
           <div
-            className="absolute inset-0 bg-black"
-            style={{
-              clipPath: `circle(${shapeRadiusPercent}% at 50% 50%)`,
-              WebkitClipPath: `circle(${shapeRadiusPercent}% at 50% 50%)`,
-            }}
+            key={index}
+            ref={(el) => (pillsRefs.current[index] = el)}
+            className="absolute pointer-events-none hidden lg:block"
+            style={{ top: pill.top, left: pill.left, zIndex: pill.zIndex }}
+          >
+            <div 
+              className="pill-inner px-10 py-3.5 rounded-[40px] bg-black text-white font-medium text-sm tracking-wider shadow-2xl whitespace-nowrap"
+              style={{ transform: `rotate(${pill.rotation}deg)` }}
+            >
+              {pill.label}
+            </div>
+          </div>
+        ))} */}
+
+        {/* Grey D-shape — bottom left platform */}
+        <div ref={dShapeRef} className="absolute bottom-0 z-0 left-0 w-[78%] h-[48%] rounded-r-[40vw] lg:rounded-r-[611px] bg-[#ececec]" />
+
+        {/* Hero image wrapper — clips to circle during Phase 2 */}
+        <div
+          ref={heroImageWrapperRef}
+          className="absolute z-[5] inset-0 flex items-center justify-center overflow-hidden pointer-events-none"
+          style={{ clipPath: 'circle(150% at 50% 100%)' }}
+        >
+          <div ref={heroImageBgRef} className="absolute inset-0 bg-[#FF6B4A]" style={{ opacity: 0 }} />
+          <img
+            ref={heroImageRef}
+            src={heroImage}
+            alt="hero background"
+            className="relative z-[1] w-auto h-[100vh] lg:h-[110vh] object-cover object-top pointer-events-none select-none origin-center"
+            draggable={false}
           />
         </div>
 
-        <div className={`pointer-events-none absolute inset-0 z-0 w-full h-full transition-opacity duration-1000 delay-[600ms] ease-out ${!isPreloaderFinished ? 'opacity-0' : 'opacity-100'}`}>
-          {/* Combined Wrapper for 3-Column Text & PORTFOLIO Text */}
-          <div className="relative w-full h-[100vh] pt-[150px] xl:pt-[100px] pb-[80px] flex justify-center items-center pointer-events-none z-10 w-full">
-            <div className="h-full w-full flex flex-col justify-between items-center xl:w-fit px-6 lg:px-[6vw] xl:px-0">
-              {/* Top 3-Column Meta Info Wrapper */}
-              <div ref={firstSceneMetaRef} className="w-full flex flex-wrap xl:flex-nowrap justify-between opacity-80 z-20 gap-y-10">
-              <div className="flex items-start gap-2 max-w-[260px] pointer-events-auto">
-                <span className="text-2xl font-extrabold text-[#f12020] mt-[-2px] pointer-events-none">›</span>
-                <div className="flex flex-col gap-5 text-left">
-                  <div className="flex flex-col gap-1.5 pointer-events-none">
-                    <p className="font-extrabold text-[#111] text-lg lg:text-base uppercase tracking-wider">7+ HACKATHONS WINNER</p>
-                    <p className="text-gray-500 font-medium text-[10px] lg:text-xs">Proven track record of building innovative solutions in record time.</p>
+
+
+
+
+        {/* Lower section: social (left) + CTA (right) - Extracted out for top z-index */}
+        <div ref={firstSceneMetaRef} className="absolute bottom-0 left-0 w-full z-50 flex items-end justify-between px-4 sm:px-[30px] pb-8 md:pb-12 gap-4 pointer-events-auto">
+          {/* Social icons — vertical stack */}
+          <div className="flex flex-col gap-6">
+            {communityIcons.map((icon, index) => (
+              <a
+                key={icon.alt}
+                ref={(el) => socialRefs.current[index] = el}
+                href={icon.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative flex items-center"
+              >
+                <div className="grid h-8 w-8 place-items-center transition-transform duration-300 ease-out group-hover:scale-125">
+                  <icon.Icon className="h-6 w-6 text-black opacity-80 group-hover:opacity-100 transition-opacity" strokeWidth={1.5} />
+                </div>
+                {/* Hover Chip */}
+                <div className="absolute left-full ml-4 opacity-0 -translate-x-4 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 ease-out z-50">
+                  <div className="bg-black text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-sm whitespace-nowrap shadow-lg">
+                    {icon.alt}
                   </div>
                 </div>
-              </div>
-              <div className="flex items-start gap-2 max-w-[260px]">
-                <span className="text-2xl font-extrabold text-[#f12020] mt-[-2px]">›</span>
-                <div className="flex flex-col gap-1.5 text-left">
-                  <p className="font-extrabold text-[#111] text-lg lg:text-base uppercase tracking-wider">WEB DESIGNER / UI/UX</p>
-                  <p className="text-gray-500 font-medium text-[10px] lg:text-xs">Crafting immersive and functional digital aesthetics for modern brands.</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-2 max-w-[260px]">
-                <span className="text-2xl font-extrabold text-[#f12020] mt-[-2px]">›</span>
-                <div className="flex flex-col gap-1.5 text-left">
-                  <p className="font-extrabold text-[#111] text-lg lg:text-base uppercase tracking-wider">BASED IN INDIA</p>
-                  <p className="text-gray-500 font-medium text-[10px] lg:text-xs">Delivering global scale products built with passion, precision, and artistry.</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Solid Filled PORTFOLIO Text */}
-            <div className="w-fit flex flex-col items-center overflow-visible px-4 lg:px-0">
-              <motion.div
-                className="font-condenso select-none text-[110vw] sm:text-[90vw] md:text-[200px] lg:text-[750px] xl:text-[700px] 2xl:text-[750px] uppercase tracking-[0.001em] text-neutral-300 flex flex-col xl:block justify-center items-center text-center w-full translate-y-[15%] xl:translate-y-[20%]"
-                style={{
-                  lineHeight: 0.75,
-                  paddingTop: '0.01em',
-                  paddingBottom: '0.01em',
-                }}
-              >
-                {portfolioWordGroups.map((group, index) => (
-                  <motion.span
-                    key={group}
-                    ref={(element) => {
-                      portfolioWordRefs.current[index] = element
-                    }}
-                    className="block xl:inline-block"
-                  >
-                    {group}
-                  </motion.span>
-              ))}
-              </motion.div>
-            </div>
+              </a>
+            ))}
           </div>
 
-            {/* <div className="text-right flex-col w-full -mt-26 select-none">
+          {/* CTA button — right aligned */}
+          <Link
+            ref={ctaRef}
+            to="/contact"
+            className="bg-white text-black font-atelier text-xs md:text-xs px-6 md:px-10 py-4 md:py-5 leading-[80%] tracking-wide hover:bg-gray-100 transition-colors shadow-md"
+          >
+            GET IN TOUCH
+          </Link>
+        </div>
+
+        <div className={`pointer-events-none absolute inset-0 z-[2] w-full h-full transition-opacity duration-1000 delay-[600ms] ease-out ${!isPreloaderFinished ? 'opacity-0' : 'opacity-100'}`}>
+          {/* Combined Wrapper for ASK CREATIONS Text & Layout */}
+          <div className="relative w-full h-full flex flex-col pointer-events-none z-10">
+            {/* Full-width text block with subtitle overlay */}
+            <div className="relative w-full px-2 md:px-4 pt-2 md:pt-[56px]">
+              {/* ASK — clipped container */}
+              <div className="overflow-hidden pt-10 -mt-10">
+                <div
+                  className="font-atelier select-none text-[clamp(68px,15.5vw,280px)] uppercase text-white"
+                  style={{ lineHeight: '80%', letterSpacing: '0.7vw' }}
+                >
+                  {askWordGroups.map((group, index) => (
+                    <motion.span
+                      key={index}
+                      ref={(element) => {
+                        portfolioWordRefs.current[index] = element
+                      }}
+                      className="inline-block"
+                    >
+                      {group}
+                    </motion.span>
+                  ))}
+                </div>
+              </div>
+
+              {/* CREATIONS — clipped container */}
+              <div className="overflow-hidden pt-10 -mt-10">
+                <div
+                  className="font-atelier select-none text-[clamp(68px,15.5vw,280px)] uppercase text-white"
+                  style={{ lineHeight: '80%', letterSpacing: '0.7vw' }}
+                >
+                  {creationsWordGroups.map((group, index) => (
+                    <motion.span
+                      key={index + askWordGroups.length}
+                      ref={(element) => {
+                        portfolioWordRefs.current[index + askWordGroups.length] = element
+                      }}
+                      className="inline-block"
+                    >
+                      {group}
+                    </motion.span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Subtitle — absolutely positioned top right */}
+              <div className="absolute top-2 md:top-[80px] right-4 md:right-8 w-[30%] md:w-[30%]">
+                <p ref={subtitleRef} className="font-clash-display font-medium z-40 text-[#E5E5E5] text-xs sm:text-sm md:text-base lg:text-base tracking-wide text-justify leading-[100%]">
+                  UI/UX DESIGNER CRAFTING INTUITIVE, USER&#8209;FRIENDLY EXPERIENCES THROUGH WIREFRAMING, PROTOTYPING, &amp; VISUAL DESIGN.
+                </p>
+              </div>
+
+              {/* Based in India — right aligned below text */}
+              <div className="w-full flex justify-end mt-1 pr-2 md:pr-6 overflow-hidden">
+                <motion.p
+                  ref={basedRef}
+                  initial={{ y: '100%' }}
+                  animate={{ y: isPreloaderFinished ? 0 : '100%' }}
+                  transition={{ duration: 1.0, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                  className="text-white font-sans text-[10px] md:text-sm tracking-[12px] uppercase"
+                >
+                  Based in India
+                </motion.p>
+              </div>
+            </div>
+            {/* Flexible spacer */}
+            <div className="flex-1" />
+          </div>
+
+          {/* <div className="text-right flex-col w-full -mt-26 select-none">
               <div ref={basedRef} className="text-2xl uppercase tracking-[0.2em] absolute -right-20 px-6 font-medium text-[#000000] opacity-80 text-right">
                 Based in INDIA
               </div>
@@ -755,20 +865,19 @@ function Hero({ isPreloaderFinished = true }) {
                 anywhere, instantly
               </div>
             </div> */}
-            {/* <div className="font-condenso select-none w-full">
+          {/* <div className="font-condenso select-none w-full">
               <div className="text-5xl px-2 uppercase tracking-[0.08em] text-[#000000] opacity-80 text-right">
               Welcome to my
               </div>
               </div> */}
-          </div>
 
           {/* <div
             ref={firstSceneMetaRef}
             className="absolute top-24 left-4 lg:top-auto lg:bottom-36 lg:left-auto lg:right-48 z-30 flex lg:flex flex-col items-start lg:items-end gap-6 lg:gap-10 opacity-90 hidden sm:flex"
           >
             <div className="grid grid-cols-2 gap-x-8 lg:gap-x-16 gap-y-6 lg:gap-y-12 max-w-[320px] lg:max-w-[550px] text-left lg:text-right"> */}
-              {/* Left Column */}
-              {/* <div className="flex flex-col justify-between gap-2">
+          {/* Left Column */}
+          {/* <div className="flex flex-col justify-between gap-2">
                 <p className="text-sm font-extrabold uppercase leading-[1.5] tracking-wide text-[#333]">
                   Web and Mobile / UX<br />And UI / Branding
                 </p>
@@ -777,8 +886,8 @@ function Hero({ isPreloaderFinished = true }) {
                 </p>
               </div> */}
 
-              {/* Right Column */}
-              {/* <div className="flex flex-col justify-between gap-2">
+          {/* Right Column */}
+          {/* <div className="flex flex-col justify-between gap-2">
                 <p className="text-sm font-extrabold uppercase leading-[1.5] tracking-wide text-[#333]">
                   Based in India
                 </p>
@@ -786,10 +895,10 @@ function Hero({ isPreloaderFinished = true }) {
                   Born in<br />Uttar Pradesh
                 </p>
               </div> */}
-            {/* </div> */}
+          {/* </div> */}
 
-            {/* Achievement Capsule */}
-            {/* <div className="flex items-center gap-2.5 rounded-full border border-black/10 bg-black/5 px-5 py-2 backdrop-blur-md">
+          {/* Achievement Capsule */}
+          {/* <div className="flex items-center gap-2.5 rounded-full border border-black/10 bg-black/5 px-5 py-2 backdrop-blur-md">
               <span className="text-base drop-shadow-sm">🏆</span>
               <p className="font-serif italic text-base font-semibold text-[#444] tracking-wide">
                 7+ times hackathon winner
@@ -809,321 +918,98 @@ function Hero({ isPreloaderFinished = true }) {
             </div>
           </div> */}
         </div>
-        <div className="relative flex h-full w-full max-w-[1920px] 2xl:max-h-[1080px] 3xl:aspect-video mx-auto flex-col gap-3 lg:flex-row">
-          <div
-            className={`hero-profile-wrapper relative z-10 flex lg:min-h-[520px] flex-col overflow-hidden ${transitionClass}
-              ${isBentoVisible ? 'flex-none lg:flex-[0_0_33.333%] lg:h-auto lg:min-h-[520px]' : 'flex-1 lg:flex-[0_0_100%]'
-              }`}
-          >
-            <div
-              className={`relative flex-1 origin-bottom overflow-hidden transition-all duration-[1200ms] delay-100 ease-[cubic-bezier(0.16,1,0.3,1)] ${isPreloaderFinished ? 'scale-100 opacity-100' : 'scale-[0.2] opacity-0'} ${transitionClass} ${isSocialVisible ? 'bg-[#d8d6d8]' : 'bg-transparent'
-                } ${isSocialVisible ? 'rounded-xl' : 'rounded-none'
-                } ${isSocialVisible ? 'mb-3' : 'mb-0'
-                }`}
-            >
-              <img
-                src={amanBg}
-                alt="Portrait"
-                className={`pointer-events-none absolute bottom-0 left-1/2 z-20 h-[55vh] w-auto max-w-none lg:h-full lg:max-h-none lg:w-auto -translate-x-1/2 origin-bottom object-cover ${isImageExpanded ? 'scale-100 lg:scale-[0.92]' : 'scale-[0.85] lg:scale-[0.75]'
-                  }`}
-              />
 
-              {/* Passion Text Desktop Inside Portrait Wrapper */}
-              <div ref={passionTextRef} className="absolute left-[50%] ml-[140px] lg:ml-[180px] xl:ml-[220px] 2xl:ml-[260px] bottom-24 lg:bottom-24 z-30 hidden lg:flex flex-col items-start opacity-90 transition-opacity duration-500 pointer-events-none">
-                <div className="font-clash-display font-bold text-[70px] lg:text-[85px] xl:text-[100px] 2xl:text-[120px] tracking-tighter uppercase text-[#111] flex flex-col items-start" style={{ lineHeight: 0.85 }}>
-                  <div className="passion-word" style={{ clipPath: 'inset(0% 100% 0% 0%)' }}>Passion</div>
-                  <div className="passion-word" style={{ clipPath: 'inset(0% 100% 0% 0%)' }}>Ambition</div>
-                  <div className="passion-word" style={{ clipPath: 'inset(0% 100% 0% 0%)' }}>Vision</div>
-                </div>
-              </div>
 
-              {/* Trust Badge Desktop */}
-              {/* <div ref={trustBadgeRef} className="absolute right-[60%] mr-[140px] lg:mr-[180px] xl:mr-[220px] 2xl:mr-[260px] bottom-24 z-30 hidden lg:flex flex-col items-start opacity-0 translate-y-8 pointer-events-auto">
-                 <div className="bg-[#111]/95 backdrop-blur-xl text-white p-5 rounded-2xl border border-white/10 shadow-2xl flex flex-col gap-3 w-[260px] hover:-translate-y-2 transition-transform duration-500 cursor-default">
-                    <div className="flex items-center gap-3">
-                       <div className="flex -space-x-2">
-                         <div className="w-9 h-9 rounded-full border-2 border-[#111] bg-gray-200 overflow-hidden shrink-0">
-                           <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" alt="Client" className="w-full h-full object-cover" />
-                         </div>
-                         <div className="w-9 h-9 rounded-full border-2 border-[#111] bg-gray-300 overflow-hidden shrink-0">
-                           <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=100&q=80" alt="Client" className="w-full h-full object-cover" />
-                         </div>
-                         <div className="w-9 h-9 rounded-full border-2 border-[#111] bg-gray-400 overflow-hidden shrink-0">
-                           <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80" alt="Client" className="w-full h-full object-cover" />
-                         </div>
-                       </div>
-                       <div className="flex flex-col justify-center">
-                         <div className="flex text-yellow-400">
-                           {[1,2,3,4,5].map(i => <svg key={i} className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>)}
-                         </div>
-                         <span className="text-[10px] uppercase tracking-wider text-gray-300 font-medium mt-0.5">5.0 Client Rating</span>
-                       </div>
-                    </div>
-                    <p className="text-sm font-medium leading-snug text-gray-200">
-                      Delivering exceptional digital experiences for global brands.
-                    </p>
-                 </div>
-              </div> */}
-
-              <div
-                className="pointer-events-none absolute inset-0 z-0 overflow-hidden flex items-end justify-center"
-                style={{ opacity: videoOpacity }}
-              >
-                  <canvas
-                    ref={!isMobile ? sequenceCanvasRef : null}
-                    className="max-h-screen lg:h-screen max-w-6xl opacity-80 w-full origin-bottom"
-                    style={{ transform: 'rotateY(180deg) translateZ(0)', willChange: 'transform' }}
-                  />
-              </div>
-            </div>
-
-            <div
-              ref={transitionTextRef}
-              className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center text-center"
-              style={{ opacity: textOpacity }}
-            >
-              <div className="absolute left-4 lg:left-28 bottom-16 lg:bottom-16 max-w-[280px] lg:max-w-[360px] text-left text-white">
-                <p className="text-xs lg:text-sm uppercase tracking-[0.24em] text-white/70">Now Creating</p>
-                <p className="mt-2 lg:mt-3 text-base lg:text-lg leading-relaxed text-white/90">
-                  Ideas into campaigns, interfaces, and motion stories that feel handcrafted and unforgettable.
-                </p>
-              </div>
-              <div className="absolute top-8 left-4 lg:top-16 lg:left-28 max-w-screen text-left text-white max-w-[280px] lg:max-w-none">
-                <h1 className="text-4xl lg:text-8xl font-regular leading-8 lg:leading-14 tracking-tighter sm:text-8xl">Built</h1>
-                <p className="pl-4 lg:pl-16 text-xl lg:text-8xl font-serif font-extralight italic tracking-tighter text-white/95 sm:text-8xl">from instinct,</p>
-              </div>
-              <div className="absolute bottom-40 right-4 lg:bottom-16 lg:right-28 max-w-fit text-right text-white">
-                <p className="text-xl lg:text-8xl leading-[1.2] font-medium text-white/95 sm:text-4xl mb-1 lg:mb-0">refined by</p>
-                <h1 className="text-4xl lg:text-8xl font-regular italic font-serif tracking-tight sm:text-9xl">
-                  {['D', 'e', 's', 'i', 'g', 'n', '.'].map((char, index) => (
-                    <span
-                      key={index}
-                      ref={(el) => designWordRefs.current[index] = el}
-                      className="inline-block"
-                    >
-                      {char}
-                    </span>
-                  ))}
-                </h1>
-              </div>
-            </div>
-
-            <motion.div
-              initial={false}
-              animate={
-                isSocialVisible
-                  ? { height: 'auto', y: 0, opacity: 1 }
-                  : { height: 0, y: -28, opacity: 0 }
-              }
-              transition={{ duration: isReady ? 1.3 : 0, ease: [0.16, 1, 0.3, 1] }}
-              className={isSocialVisible ? 'overflow-hidden' : 'pointer-events-none overflow-hidden'}
-            >
-              <div className="flex items-center justify-center rounded-xl bg-[#d8d3e9] px-6 py-7 text-[#43396d]">
-                <p className="text-3xl font-light font-serif italic tracking-wide">Aman Singh Kaushik</p>
-              </div>
-            </motion.div>
-          </div>
-
-          <div className={`relative z-20 lg:flex-[0_0_66.666%] transition-all duration-[1200ms] delay-[300ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${isBentoVisible ? 'opacity-100' : 'opacity-0 max-h-0 lg:max-h-none pointer-events-none'} ${!isPreloaderFinished ? 'translate-y-12 opacity-0' : ''}`}>
-            <div
-              className={`hero-content-grid flex flex-col gap-4 lg:grid lg:gap-4 lg:grid-cols-3 lg:grid-rows-6 px-2 lg:px-0 pb-8 lg:pb-0 ${transitionClass} ${isBentoVisible
-                ? 'translate-y-0 h-max lg:h-full lg:translate-x-0'
-                : 'pointer-events-none translate-y-4 lg:translate-x-[-6%]'
-                }`}
-            >
-              <div className="group col-span-1 lg:col-span-1 relative overflow-hidden rounded-xl bg-[#ece868] p-3 lg:p-6 text-[#101010] row-span-2 lg:row-span-2 transition-transform duration-300 hover:scale-[1.02] hover:shadow-lg flex flex-col justify-between">
-                <div className="max-w-[240px]">
-                  <p className="font-clash-display text-[1rem] leading-tight lg:text-[1.75rem] lg:leading-[1.1] tracking-[-0.02em] font-medium">
-                    Got an <span className='italic font-serif font-medium'>idea </span>? Don't let it rest.
-                  </p>
-                  <p className="mt-2 font-clash-grotesk text-base lg:text-lg text-black/80">
-                    Let's start working on it.
-                  </p>
-                </div>
-
-                <Link
-                  to="/contact"
-                  className="mt-4 ml-auto flex w-fit items-center rounded-lg gap-1 border border-black/40 bg-[#efedb7] px-2 py-2 text-xs font-medium text-black/70"
-                >
-                  <svg
-                    className="h-4 w-4"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <rect x="9" y="9" width="11" height="11" rx="2" />
-                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                  </svg>
-                  Get in Touch
-                </Link>
-
-                <img
-                  src={arrowIcon}
-                  alt="Arrow"
-                  className="absolute bottom-6 left-6 h-12 w-12"
-                />
-              </div>
-
-              <div className="group max-w-6xl relative overflow-hidden flex flex-col sm:flex-row gap-4 lg:gap-8 items-start sm:items-center rounded-xl bg-[#eaf2ff] p-5 lg:p-7 text-[#12305f] lg:col-span-2 lg:row-span-2 transition-transform duration-300 hover:scale-[1.02] hover:shadow-lg">
-                <p className="font-clash-grotesk flex-1 text-left text-lg lg:text-[1.35rem] leading-[1.4] text-[#143467]">
-                  As an engineering student and digital designer, I specialize in crafting meaningful
-                  UI/UX experiences, visual identities, and logo systems.
-                </p>
-                <img className='h-32 w-32 md:h-40 md:w-40 lg:h-48 lg:w-48 transition-transform duration-700 object-contain' src={astrick} alt="Astrick" />
-              </div>
-              <div className="flex h-full min-h-0 flex-col gap-2 lg:gap-3 row-span-1 lg:row-span-2 col-span-1 lg:col-span-1">
-                <div className="relative flex-1 overflow-hidden rounded-xl bg-[#72e6cc] px-4 flex items-center min-h-[100px] lg:min-h-[120px]">
-                  <motion.div
-                    className="flex w-max flex-nowrap items-center gap-5"
-                    animate={{ x: ['0%', '-50%'] }}
-                    transition={{ duration: 20, ease: 'linear', repeat: Infinity }}
-                  >
-                    {[...toolIcons, ...toolIcons, ...toolIcons].map((icon, index) => (
-                      <div key={`tool-desktop-${icon.alt}-${index}`} className="shrink-0 flex items-center justify-center">
-                        <img src={icon.src} alt={icon.alt} className="h-10 w-10 lg:h-14 lg:w-14 rounded-2xl object-contain drop-shadow-md" />
-                      </div>
-                    ))}
-                  </motion.div>
-                </div>
-
-                <div className="flex flex-1 items-center justify-center overflow-hidden rounded-xl bg-[#7cc4ff] px-2">
-                  <div className="flex w-full items-center justify-center">
-                    {communityIcons.map((icon) => (
-                      <a
-                        key={icon.alt}
-                        href={icon.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="grid h-14 w-14 place-items-center transition-transform duration-200 hover:scale-125 hover:-translate-y-1"
-                      >
-                        <img src={icon.src} alt={icon.alt} className="h-10 w-10 rounded-2xl object-contain shadow-sm" />
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-center rounded-xl bg-[#eaf2ff] p-2 lg:p-4 text-[#101828] col-span-2 lg:col-span-1 row-span-1 lg:row-span-2 transition-colors hover:bg-white hover:shadow-lg">
-                <div className="flex justify-between md:grid h-full w-full max-w-[480px] md:grid-cols-2 md:grid-rows-2 gap-[4px] lg:gap-x-6 lg:gap-y-6 px-1 lg:px-4 py-1 lg:py-4">
-                  <div className="group flex h-full w-full flex-col items-start justify-center text-left transition-transform duration-300 hover:scale-105 hover:translate-x-1">
-                    <p className="font-clash-display text-xl lg:text-3xl font-semibold tracking-tight">1+</p>
-                    <p className="mt-1 text-[9px] md:text-sm font-medium leading-[1.1] text-[#5c6375]">Years<span className="hidden sm:inline"> experience</span></p>
-                  </div>
-                  <div className="group flex h-full w-full flex-col items-start justify-center text-left transition-transform duration-300 hover:scale-105 hover:translate-x-1">
-                    <p className="font-clash-display text-xl lg:text-3xl font-semibold tracking-tight">3+</p>
-                    <p className="mt-1 text-[9px] md:text-sm font-medium leading-[1.1] text-[#5c6375]">Projects<span className="hidden sm:inline"> completed</span></p>
-                  </div>
-                  <div className="group flex h-full w-full flex-col items-start justify-center text-left transition-transform duration-300 hover:scale-105 hover:translate-x-1 md:flex">
-                    <p className="font-clash-display text-xl lg:text-3xl font-semibold tracking-tight">3+</p>
-                    <p className="mt-1 text-[9px] md:text-sm font-medium leading-[1.1] text-[#5c6375]">Happy clients Worldwide</p>
-                  </div>
-                  <div className="group flex h-full w-full flex-col items-start justify-center text-left transition-transform duration-300 hover:scale-105 hover:translate-x-1 md:flex">
-                    <p className="font-clash-display text-xl lg:text-3xl font-semibold tracking-tight">7+</p>
-                    <p className="mt-1 text-[9px] md:text-sm font-medium leading-[1.1] text-[#5c6375]">Hackathon Winner</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="relative flex h-full min-h-[160px] lg:min-h-0 flex-col justify-between overflow-hidden rounded-xl bg-[#eaf2ff] p-4 text-[#12305f] lg:col-span-1 lg:col-start-3 lg:row-span-4 lg:row-start-3">
-                <div className="flex items-center justify-between px-2 lg:px-4 py-2 lg:py-3">
-                  <p className="mt-1 text-xl lg:text-3xl font-light leading-tight tracking-wider font-serif italic text-[#143467]">What <br /> I Offer</p>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="58"
-                    height="58"
-                    viewBox="0 0 256 256"
-                    fill="none"
-                    className="pointer-events-none h-[4.75rem] w-[4.75rem] shrink-0"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M152 70.059L201.539 20.519L235.48 54.461L185.941 104H256V152H185.941L235.48 201.539L201.539 235.48L152 185.941V256H104V185.941L54.46 235.48L20.52 201.539L70.059 152H0V104H70.059L20.519 54.46L54.461 20.52L104 70.059V0H152Z"
-                      fill="rgb(00, 00, 84)"
-                    />
-                  </svg>
-                </div>
-
-                <div className="mt-2 flex flex-col gap-1.5">
-                  <div className="flex items-center gap-3 rounded-[14px] px-3 py-3">
-                    <span className="grid h-8 w-8 place-items-center rounded-[10px] bg-[#bfdbfe] text-xs font-semibold text-[#1e3a8a]">BR</span>
-                    <p className="text-[1.15rem] font-medium text-[#143467]">Branding</p>
-                  </div>
-                  <div className="flex items-center gap-3 rounded-[14px] px-3 py-3">
-                    <span className="grid h-8 w-8 place-items-center rounded-[10px] bg-[#bfdbfe] text-xs font-semibold text-[#1e3a8a]">UX</span>
-                    <p className="text-[1.15rem] font-medium text-[#143467]">UI/UX Design</p>
-                  </div>
-                  <div className="flex items-center gap-3 rounded-[14px] px-3 py-3">
-                    <span className="grid h-8 w-8 place-items-center rounded-[10px] bg-[#bfdbfe] text-xs font-semibold text-[#1e3a8a]">IL</span>
-                    <p className="text-[1.15rem] font-medium text-[#143467]">Illustration</p>
-                  </div>
-                  <div className="flex items-center gap-3 rounded-[14px] px-3 py-3">
-                    <span className="grid h-8 w-8 place-items-center rounded-[10px] bg-[#bfdbfe] text-xs font-semibold text-[#1e3a8a]">WD</span>
-                    <p className="text-[1.15rem] font-medium text-[#143467]">Web Development</p>
-                  </div>
-                  <div className="flex items-center gap-3 rounded-[14px] px-3 py-3">
-                    <span className="grid h-8 w-8 place-items-center rounded-[10px] bg-[#bfdbfe] text-xs font-semibold text-[#1e3a8a]">VI</span>
-                    <p className="text-[1.15rem] font-medium text-[#143467]">Visual Identity</p>
-                  </div>
-                </div>
-              </div>
-
-              <a href="#work" className="group relative overflow-hidden rounded-xl col-span-1 lg:col-span-2 row-span-2 lg:row-span-2 cursor-pointer transition-shadow duration-300 hover:shadow-xl block min-h-[220px] lg:min-h-[80px]">
-                <div
-                  className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-700 ease-out group-hover:scale-110"
-                  style={{ backgroundImage: `url(${taglineMockup})` }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent transition-opacity duration-300 group-hover:from-black/80" />
-                <div className="absolute bottom-5 right-6 flex items-center gap-4 translate-y-4 opacity-0 transition-all duration-500 ease-out group-hover:translate-y-0 group-hover:opacity-100">
-                  <p className="text-right font-clash-display text-4xl font-semibold text-white">
-                    Projects
-                  </p>
-                  <img
-                    src={arrowIcon}
-                    alt="Arrow"
-                    className="h-10 w-10 brightness-0 rotate-90 invert transition-transform duration-500 group-hover:translate-x-2"
-                  />
-                </div>
-              </a>
-            </div>
-          </div>
-        </div>
-
+        {/* ── About Me Scene (Phase 3) ── */}
         <div
-          className={`absolute inset-x-0 bottom-0 z-50 w-full bg-black px-4 sm:px-[30px] pt-1 pb-2 sm:py-[10px] text-white pointer-events-auto transition-all duration-1000 ease-[cubic-bezier(0.65,0,0.35,1)] ${
-            !isPreloaderFinished ? 'opacity-0 translate-y-full' 
-            : progress > 0.05 ? 'opacity-0 translate-y-full' 
-            : 'opacity-100 translate-y-0'
-          }`}
+          ref={aboutSceneRef}
+          className="absolute inset-0 z-[8] flex flex-col items-center justify-center pointer-events-none"
+          style={{ opacity: 0, transform: 'translateY(30px)' }}
         >
-          <div className="flex items-center justify-between py-1 sm:py-[10px] relative">
-            <p className="text-sm font-semibold uppercase tracking-[0.12em] leading-[0.1] sm:text-base flex-1">
-              <span className='font-gochi-hand text-2xl'>ASK</span> <br /> <span className='pl-1 text-sm sm:text-lg leading-0.5 tracking-tighter'>CREATIONS</span>
-            </p>
+          {/* Top: ABOUT ME pill + heading */}
+          <div className="absolute top-[8%] lg:top-[10%] left-0 right-0 flex flex-col items-center text-center px-6">
+            <div ref={aboutPillRef} className="bg-white text-black font-bold text-[10px] lg:text-xs tracking-[0.2em] px-4 py-1.5 rounded-full mb-5 lg:mb-6 shadow-sm uppercase">
+              ABOUT ME
+            </div>
+            <h2 className="max-w-[700px] text-xl sm:text-2xl lg:text-[2.2rem] font-black uppercase tracking-tight text-[#111] leading-[1.15] lg:leading-[1.15]">
+              <span className="block overflow-hidden pb-1"><span ref={el => aboutHeadingLineRefs.current[0] = el} className="block">UI/UX Designer crafting intuitive,</span></span>
+              <span className="block overflow-hidden pb-1"><span ref={el => aboutHeadingLineRefs.current[1] = el} className="block">user-friendly experiences through wireframing,</span></span>
+              <span className="block overflow-hidden pb-1"><span ref={el => aboutHeadingLineRefs.current[2] = el} className="block">prototyping, &amp; visual design.</span></span>
+            </h2>
+          </div>
 
-            <div className="hidden lg:flex flex-1 justify-center items-center pointer-events-none">
-              <div className="flex flex-col items-center gap-1 opacity-50">
-                <div className="w-[1.5px] h-6 bg-white/20 relative overflow-hidden rounded-full">
-                  <motion.div 
-                    animate={{ y: [-10, 24] }}
-                    transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                    className="w-full h-3 bg-white absolute top-0"
-                  />
-                </div>
-                <span className="text-[10px] uppercase tracking-[0.2em] font-bold mt-1">Scroll</span>
+          {/* Middle: Stats flanking the circular hero image */}
+          <div ref={aboutStatsRef} className="absolute top-[48%] lg:top-[48%] left-0 right-0 flex items-center justify-between px-6 sm:px-12 lg:px-[8%]">
+            {/* Left column stats */}
+            <div className="flex flex-col gap-16 lg:gap-24 relative">
+              <div ref={aboutLineLeftRef} className="absolute top-1/2 -translate-y-1/2 left-0 right-[-30px] lg:right-[-60px] h-[1px] bg-[#222] origin-left" style={{ scaleX: 0 }} />
+              <div ref={el => aboutStatItemRefs.current[0] = el} style={{ opacity: 0, transform: 'translateY(30px)' }}>
+                <h3 className="text-5xl lg:text-7xl font-black text-[#111] leading-none tracking-tight">07</h3>
+                <p className="text-[10px] lg:text-xs font-bold text-[#111] uppercase tracking-wider mt-1">Years of Experience</p>
+              </div>
+              <div ref={el => aboutStatItemRefs.current[1] = el} style={{ opacity: 0, transform: 'translateY(30px)' }}>
+                <h3 className="text-5xl lg:text-7xl font-black text-[#111] leading-none tracking-tight">120+</h3>
+                <p className="text-[10px] lg:text-xs font-bold text-[#111] uppercase tracking-wider mt-1">Total Projects</p>
               </div>
             </div>
 
-            <div className="flex-1 flex justify-end">
-              <Link
-                to="/contact"
-                className="pointer-events-auto bg-white px-5 py-2.5 sm:px-10 sm:py-3 text-[11px] sm:text-sm font-semibold text-black transition-colors hover:bg-zinc-200 whitespace-nowrap block text-center"
+            {/* Spacer for the circular image in the center */}
+            <div className="w-[34%] lg:w-[30%]" />
+
+            {/* Right column stats */}
+            <div className="flex flex-col gap-16 lg:gap-24 relative text-right items-end">
+              <div ref={aboutLineRightRef} className="absolute top-1/2 -translate-y-1/2 left-[-30px] lg:left-[-60px] right-0 h-[1px] bg-[#222] origin-right" style={{ scaleX: 0 }} />
+              <div ref={el => aboutStatItemRefs.current[2] = el} style={{ opacity: 0, transform: 'translateY(30px)' }}>
+                <div className="flex justify-end gap-0.5 mb-1 text-xs lg:text-sm text-[#111]">★★★★★</div>
+                <h3 className="text-5xl lg:text-7xl font-black text-[#111] leading-none tracking-tight">5.00</h3>
+                <p className="text-[10px] lg:text-xs font-bold text-[#111] uppercase tracking-wider mt-1">70 rating</p>
+              </div>
+              <div ref={el => aboutStatItemRefs.current[3] = el} style={{ opacity: 0, transform: 'translateY(30px)' }}>
+                <h3 className="text-5xl lg:text-7xl font-black text-[#111] leading-none tracking-tight">03</h3>
+                <p className="text-[10px] lg:text-xs font-bold text-[#111] uppercase tracking-wider mt-1">Awards</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom: Download CV star badge — 15-sided rounded star, endless rotation */}
+          <div ref={aboutBadgeRef} className="absolute z-10" style={{ top: '75%', left: '55%', opacity: 0, transform: 'scale(0)' }}>
+            <div className="w-24 h-24 lg:w-28 lg:h-28 relative pointer-events-auto cursor-pointer group">
+              {/* Rotating star */}
+              <svg
+                className="w-full h-full animate-spin-slow"
+                viewBox="0 0 200 200"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                Get in Touch
-              </Link>
+                <path
+                  d={(() => {
+                    const cx = 100, cy = 100, outerR = 96, innerR = 80, points = 15;
+                    let d = '';
+                    for (let i = 0; i < points; i++) {
+                      const outerAngle = (Math.PI * 2 * i) / points - Math.PI / 2;
+                      const innerAngle = (Math.PI * 2 * (i + 0.5)) / points - Math.PI / 2;
+                      const ox = cx + outerR * Math.cos(outerAngle);
+                      const oy = cy + outerR * Math.sin(outerAngle);
+                      const ix = cx + innerR * Math.cos(innerAngle);
+                      const iy = cy + innerR * Math.sin(innerAngle);
+                      if (i === 0) d += `M ${ox} ${oy} `;
+                      else d += `L ${ox} ${oy} `;
+                      d += `Q ${ix} ${iy} `;
+                      const nextAngle = (Math.PI * 2 * (i + 1)) / points - Math.PI / 2;
+                      const nx = cx + outerR * Math.cos(nextAngle);
+                      const ny = cy + outerR * Math.sin(nextAngle);
+                      d += `${nx} ${ny} `;
+                    }
+                    return d + 'Z';
+                  })()}
+                  fill="white"
+                />
+              </svg>
+              {/* Center text */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-[7px] lg:text-[8px] font-bold text-center leading-tight tracking-[0.15em] uppercase text-black">Download<br/>My CV</span>
+                <svg className="w-3 h-3 mt-0.5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
+              </div>
             </div>
           </div>
         </div>

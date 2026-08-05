@@ -65,16 +65,17 @@ function QuoteSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full py-40 flex items-center justify-center bg-white"
+      className="relative w-full py-32 md:py-48 flex items-center justify-center bg-[#000000]"
     >
-      <div className="max-w-5xl px-8">
+      <div className="max-w-6xl px-8 flex flex-col items-center relative">
+        <span className="font-atelier text-[#FF3D3D] text-[120px] md:text-[200px] leading-none mb-[-60px] md:mb-[-100px] opacity-40 select-none">"</span>
         <p
           ref={textRef}
-          className="text-center font-semibold text-3xl md:text-6xl leading-[1.2] md:leading-relaxed tracking-tighter text-[#0d0d0d]"
+          className="text-center font-atelier uppercase text-[clamp(2.5rem,5vw,5.5rem)] leading-[0.95] tracking-wide text-[#ffffff] relative z-10"
         >
-          "Design is not just what it looks like. Design is how it works."
+          Design is not just what it looks like. Design is how it works.
         </p>
-        <p className="mt-6 w-full text-right text-2xl italic text-[#0d0d0d]">- Steve Jobs</p>
+        <p className="mt-8 md:mt-12 w-full text-right text-xl md:text-3xl font-serif italic font-medium tracking-wide text-[#FF3D3D]">- Steve Jobs</p>
       </div>
     </section>
   )

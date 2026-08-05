@@ -35,20 +35,20 @@ function TestimonialSection() {
   }, [])
 
   return (
-    <section ref={sectionRef} className="ds-section bg-white py-20 lg:py-32 relative overflow-hidden">
+    <section ref={sectionRef} className="ds-section bg-[#ececec] py-20 lg:py-32 relative overflow-hidden">
       <div className="ds-container">
         
         {/* Header with View All Button */}
         <div className="test-animate flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-6">
           <div>
-            <p className="ds-eyebrow mb-2">Testimonials</p>
-            <h2 className="text-4xl md:text-6xl font-clash-display font-semibold tracking-tight text-[#111]">
+            <p className="ds-eyebrow mb-2 text-[#FF3D3D]">Testimonials</p>
+            <h2 className="ds-heading-xl uppercase text-[#101010]">
               Client Love.
             </h2>
           </div>
           <Link 
             to="/testimonials" 
-            className="group flex flex-shrink-0 items-center gap-2 px-6 py-3 rounded-sm border border-black text-sm font-semibold uppercase tracking-widest text-[#111] hover:bg-black hover:text-white transition-colors"
+            className="group flex flex-shrink-0 items-center gap-2 rounded-full bg-[#101010] px-6 py-2 text-sm font-medium tracking-widest uppercase text-white transition-all hover:bg-[#FF3D3D]"
           >
             Show All
             <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">

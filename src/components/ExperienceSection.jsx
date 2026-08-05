@@ -54,13 +54,13 @@ function ExperienceSection() {
   }, [])
 
   return (
-    <section ref={sectionRef} className="ds-section bg-[#f5f5f7] pt-0 pb-20 lg:pb-32">
+    <section ref={sectionRef} className="ds-section bg-[#ececec] pt-0 pb-20 lg:pb-32">
       <div className="ds-container">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-16 md:gap-8">
           
           {/* Left Column - Description */}
           <div className="md:col-span-4 lg:col-span-3">
-            <p className="exp-animate text-[1.05rem] font-medium leading-[1.6] text-[#1a1a1a]">
+            <p className="exp-animate text-[1.05rem] font-medium leading-[1.6] text-[#101010]">
               My academic journey has built a strong engineering foundation while fueling my design passion. Each step has shaped my analytical thinking and creative approach to building digital experiences.
             </p>
           </div>
@@ -71,16 +71,16 @@ function ExperienceSection() {
               {education.map((edu, index) => (
                 <div 
                   key={index} 
-                  className="group flex flex-col sm:flex-row sm:items-center justify-between py-6 border-b border-black/10 exp-line transition-colors hover:bg-black/5"
+                  className="group flex flex-col sm:flex-row sm:items-center justify-between py-6 px-4 -mx-4 border-b border-black/10 exp-line transition-colors hover:bg-[#FF3D3D]"
                 >
                   <div className="flex items-center w-full sm:w-1/3 mb-2 sm:mb-0">
-                    <h4 className="exp-animate text-lg font-semibold text-[#111]">{edu.institution}</h4>
+                    <h4 className="exp-animate text-lg font-semibold text-[#111] transition-colors group-hover:text-white">{edu.institution}</h4>
                   </div>
                   <div className="flex items-center w-full sm:w-1/3 mb-2 sm:mb-0">
-                    <p className="exp-animate text-[1.05rem] font-medium text-[#444]">{edu.degree}</p>
+                    <p className="exp-animate text-[1.05rem] font-medium text-[#444] transition-colors group-hover:text-white">{edu.degree}</p>
                   </div>
                   <div className="flex items-center w-full sm:w-1/3 sm:justify-end">
-                    <p className="exp-animate text-[1.05rem] font-medium text-[#111]">{edu.year}</p>
+                    <p className="exp-animate text-[1.05rem] font-medium text-[#111] transition-colors group-hover:text-white">{edu.year}</p>
                   </div>
                 </div>
               ))}

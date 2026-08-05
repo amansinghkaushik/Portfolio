@@ -67,11 +67,17 @@ function AboutSection() {
   return (
     <section ref={sectionRef} id="about" className="ds-section bg-[#ececec] pt-8">
       <div className="ds-container">
-        <div className="about-animate-head mb-16 flex items-center justify-between">
-          <p className="ds-heading-xl lowercase">about.</p>
+        {/* Massive Stacked Header */}
+        <div className="flex flex-col items-start justify-start pt-5 pb-24 md:pb-32 overflow-hidden">
+          <h2 className="font-atelier uppercase leading-[0.8] tracking-tight text-[#101010] text-[clamp(4rem,14vw,16rem)] text-left flex flex-col items-start">
+            <span className="about-animate-head block">About</span>
+            <span className="about-animate-head flex items-center gap-2 md:gap-6 mt-2">
+              Me <span className="font-sans text-[clamp(1.5rem,4vw,4rem)] tracking-normal mt-auto mb-[2%] font-medium align-top leading-none">(01)</span>
+            </span>
+          </h2>
         </div>
 
-        <p className="about-animate-lead mb-12 max-w-2xl ds-heading-md text-[#141414]">
+        <p className="about-animate-lead mb-12 max-w-2xl ds-heading-md text-[#101010]">
           I'm an engineering student building at the intersection of UI/UX, web development,
           branding, illustration, and logo design.
         </p>
@@ -83,12 +89,12 @@ function AboutSection() {
             className="about-animate-block w-full max-w-[600px] h-[350px] md:h-[500px] lg:h-[600px] object-cover rounded-xl"
           />
           <div className="about-animate-block space-y-4">
-            <p className="ds-eyebrow">Hybrid Artist + Designer</p>
-            <p className="text-xl lg:text-2xl font-medium max-w-md">
+            <p className="ds-eyebrow text-[#FF3D3D]">Hybrid Artist + Designer</p>
+            <p className="text-xl lg:text-2xl font-medium max-w-md text-[#101010]">
               I started with traditional sketching, anatomy studies, and character design, then
               evolved into digital product design, interaction systems, and brand storytelling.
             </p>
-            <p className="text-xl lg:text-2xl font-medium max-w-md">
+            <p className="text-xl lg:text-2xl font-medium max-w-md text-[#101010]">
               My focus is creating experiences that feel expressive like art and functional like
               engineering.
             </p>
