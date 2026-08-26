@@ -67,7 +67,7 @@ function AboutSection() {
   return (
     <section ref={sectionRef} id="about" className="ds-section bg-[#ececec] pt-8">
       <div className="ds-container">
-        <div className="about-animate-head mb-16 flex items-center justify-between">
+        <div className="about-animate-head flex items-center justify-between">
           <p className="ds-heading-xl lowercase">about.</p>
         </div>
 
