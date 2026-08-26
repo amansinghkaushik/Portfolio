@@ -136,8 +136,8 @@ export default function ContactPage() {
           <div className="lg:col-span-4 lg:col-start-9 flex flex-col gap-12 pt-2 text-white/60">
             <div>
               <p className="text-xs uppercase tracking-[0.15em] text-white/30 mb-3">Email</p>
-              <a href="mailto:amansinghkauhsik8@gmail.com" className="text-lg text-white hover:text-white/70 transition-colors">
-                amansinghkauhsik8@gmail.com
+              <a href="mailto:amansinghkaushik8@gmail.com" className="text-lg text-white hover:text-white/70 transition-colors">
+                amansinghkaushik8@gmail.com
               </a>
             </div>
             <div>

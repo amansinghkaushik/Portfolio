@@ -14,11 +14,11 @@ export default function ContactSection() {
           </p>
           <div className="mb-4">
             <div className="text-base text-[#222] mb-1">Email:</div>
-            <div className="text-xl font-semibold text-black">hello@finpro.com</div>
+            <div className="text-xl font-semibold text-black">amansinghkaushik8@gmail.com</div>
           </div>
           <div className="mb-4">
             <div className="text-base text-[#222] mb-1">Phone:</div>
-            <div className="text-xl font-semibold text-black">+1 234 567 78</div>
+            <div className="text-xl font-semibold text-black">+91 9651969409</div>
           </div>
           <div className="text-sm text-[#666] mb-8">Available Monday to Friday, 9 AM - 6 PM GMT</div>
           <button className="flex items-center gap-2 px-6 py-3 rounded-full bg-black text-white font-semibold text-base hover:bg-zinc-800 transition-colors shadow-md">
