@@ -143,7 +143,7 @@ export default function ContactPage() {
             <div>
               <p className="text-xs uppercase tracking-[0.15em] text-white/30 mb-3">Phone</p>
               <a href="tel:+919651969409" className="text-lg text-white hover:text-white/70 transition-colors">
-                +91 9651 969409
+                +91 9651969409
               </a>
             </div>
             <div>
